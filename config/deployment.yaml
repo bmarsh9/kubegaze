@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webhook
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: webhook
+  namespace: webhook
+spec:
+  selector:
+    app: webhook
+  ports:
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 443
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webhook
+  namespace: webhook
+  name: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+      name: webhook
+    spec:
+      containers:
+        - name: webhook
+          image: bmarsh13/k8_audit:1.0.1
+#          image: garethr/hook:tilt-453b50a06ab920b5
+#          image: bmarsh13/spate-ui:2.2.1
+#          image: nginx
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--bind=0.0.0.0:443"
+            - "--certfile=/certs/tls.crt"
+            - "--keyfile=/certs/tls.key"
+            - "app:app"
+          volumeMounts:
+            - readOnly: true
+              mountPath: /certs
+              name: webhook-certs
+          readinessProbe:
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: 443
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              scheme: HTTPS
+              port: 443
+            initialDelaySeconds: 3
+            periodSeconds:
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: webhook-certs
