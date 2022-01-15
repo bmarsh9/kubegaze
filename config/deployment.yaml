@@ -41,7 +41,8 @@ spec:
 #          image: garethr/hook:tilt-453b50a06ab920b5
 #          image: bmarsh13/spate-ui:2.2.1
 #          image: nginx
-          imagePullPolicy: IfNotPresent
+#          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           args:
             - "--bind=0.0.0.0:443"
             - "--certfile=/certs/tls.crt"

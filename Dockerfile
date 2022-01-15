@@ -4,14 +4,11 @@ RUN pip3 install pipenv
 COPY Pipfile /app/
 COPY Pipfile.lock /app/
 
-
 FROM parent AS base
 RUN pipenv install --deploy --system
 
-
 FROM parent AS dev-base
 RUN pipenv install --deploy --system --dev
-
 
 FROM dev-base AS CLI
 RUN apk add --no-cache --update openssl
@@ -24,8 +21,8 @@ ENTRYPOINT ["invoke", "keys"]
 #RUN pipenv check --system
 #RUN pytest
 
-
 FROM base as Prod
 COPY src /app
+#RUN pip3 install -r /app/requirements.txt
 ENTRYPOINT ["gunicorn"]
 CMD ["app:app"]

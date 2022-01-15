@@ -4,14 +4,14 @@ import http
 import json
 import random
 import jsonpatch
+import requests
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-
 @app.route("/validate", methods=["POST"])
 def validate():
-    print("got a request:{}".format(str(request.json)))
+    requests.post(url="http://192.168.1.252:5000/api/v1/cluster/1/events",json=json.dumps(request.json))
     allowed = True
     try:
         for container_spec in request.json["request"]["object"]["spec"]["containers"]:

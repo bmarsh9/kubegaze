@@ -5,6 +5,8 @@ metadata:
 webhooks:
   - name: webhook.webhook.svc
     sideEffects: None
+    failurePolicy: Ignore
+    timeoutSeconds: 2
     admissionReviewVersions: ["v1", "v1beta1"]
     rules:
       - operations: ["CREATE", "UPDATE"]
