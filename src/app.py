@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/validate", methods=["POST"])
 def validate():
-    requests.post(url="http://192.168.1.252:5000/api/v1/cluster/1/events",json=json.dumps(request.json))
+    requests.post(url="http://192.168.1.252:5000/api/v1/cluster/1/events",json=request.json)
     allowed = True
     try:
         for container_spec in request.json["request"]["object"]["spec"]["containers"]:
