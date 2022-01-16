@@ -14,11 +14,35 @@ import arrow
 import json
 import os
 
+class Event(LogMixin,db.Model, UserMixin):
+    __tablename__ = 'events'
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.JSON(),default={})
+    cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    def to_list(self):
+        template = """
+          <div class="col-12 mb-2">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">{}</h3>
+              </div>
+              <div class="card-body">
+                <p>{}</p>
+              </div>
+            </div>
+          </div>
+        """.format(self.id,self.data)
+        return template
+
 class Cluster(LogMixin,db.Model, UserMixin):
     __tablename__ = 'clusters'
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(),nullable=False)
     label = db.Column(db.String(),nullable=False)
+    events = db.relationship('Event', backref='cluster', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 

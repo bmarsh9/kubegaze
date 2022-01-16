@@ -1,0 +1,47 @@
+{% extends "layouts/condensed.html" %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        Documentation
+      </div>
+      <h2 class="page-title">
+        Documentation
+      </h2>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
+{%block content%}
+  <div id="events" class="row row-cards mb-3">
+  </div>
+{%endblock%}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {
+        (function worker(next=0) {
+          $.ajax({
+            url: "/api/v1/events?next="+next,
+            success: function(data) {
+              for (var i = 0; i < data["events"].length; i++) {
+                $("#events").prepend(data["events"][i].html)
+              };
+            },
+            complete: function(event,xhr,options) {
+//haaaaaaa
+              setTimeout(function() {
+                worker(event.responseJSON.next);
+              }, 5000)
+            },
+            error: function (request, status, error) {
+              console.log("error")
+            }
+          });
+        })();
+    });
+  </script>
+{% endblock %}
