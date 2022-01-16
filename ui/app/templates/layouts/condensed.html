@@ -13,6 +13,11 @@
     {% endblock %}
     {% block before_head %}
     {% endblock %}
+    <style>
+     .alert {
+       color: black !important;
+     }
+    </style>
     <!-- CSS files -->
     <link href="{{ url_for('static', filename='css/margins.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/tabler.min.css') }}" rel="stylesheet"/>

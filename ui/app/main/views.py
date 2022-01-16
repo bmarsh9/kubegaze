@@ -11,6 +11,11 @@ from app.utils.misc import generate_uuid
 def home():
     return render_template("dashboard.html")
 
+@main.route('/test', methods=['GET'])
+@login_required
+def test():
+    return render_template("test.html")
+
 @main.route('/clusters', methods=['GET'])
 @login_required
 def clusters():

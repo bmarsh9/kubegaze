@@ -16,25 +16,32 @@
 {%endblock%}
 
 {%block content%}
-  <div id="events" class="row row-cards mb-3">
+  <div class="row row-cards mb-3">
+    <div id="events" class="accordion" id="accordionExample">
+    </div>
   </div>
 {%endblock%}
 
 {% block extrajs %}
   <script>
     $(document).ready(function() {
-        (function worker(next=0) {
+        (function worker(last=0) {
           $.ajax({
-            url: "/api/v1/events?next="+next,
+            url: "/api/v1/events?last="+last,
             success: function(data) {
+              console.log("adding "+data["events"].length+" events")
+              if (data["events"].length) {
+                notify_js("Adding "+data["events"].length+" new events", type = "success",time=1000,placement={from:"bottom",align:"right"})
+              };
               for (var i = 0; i < data["events"].length; i++) {
                 $("#events").prepend(data["events"][i].html)
               };
             },
             complete: function(event,xhr,options) {
 //haaaaaaa
+              console.log("loading more events: "+event.responseJSON.last)
               setTimeout(function() {
-                worker(event.responseJSON.next);
+                worker(event.responseJSON.last);
               }, 5000)
             },
             error: function (request, status, error) {

@@ -23,18 +23,43 @@ class Event(LogMixin,db.Model, UserMixin):
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     def to_list(self):
+        name = json.loads(self.data)["request"]["kind"]["kind"]
+        labels_html = """
+        """
+        for i in range(0,5):
+            labels_html += '<span class="badge bg-cyan-lt mr-2">bade {}</span>'.format(i)
         template = """
-          <div class="col-12 mb-2">
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">{}</h3>
-              </div>
-              <div class="card-body">
-                <p>{}</p>
-              </div>
-            </div>
-          </div>
-        """.format(self.id,self.data)
+              <div class="accordion-item mb-2 bg-dark rounded-2">
+                <h2 class="accordion-header" id="heading_{}">
+                  <button class="accordion-button collapsed text-secondary bg-dark d-block" type="button" data-bs-toggle="collapse" data-bs-target="#event_{}" aria-expanded="false" aria-controls="event_{}">
+                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere"></i></div><div class="col-11"><div class="row"><div class="col-12 mb-2 h3">{}</div><div class="col-12">{}</div></div></div></div>
+                  </button>
+                </h2>
+                <div id="event_{}" class="accordion-collapse collapse" aria-labelledby="heading_{}" data-bs-parent="#event_{}">
+                  <div class="accordion-body text-secondary border-wide">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="card bg-light">
+                              <div class="card-header">
+                                <h3 class="card-title">Event</h3>
+                              </div>
+                              <div class="card-body">
+                                <pre>{}</pre>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          test
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                    </div>
+                  </div>
+                </div>
+              </div>""".format(self.id,self.id,self.id,name,labels_html,self.id,self.id,self.id,self.data)
+
         return template
 
 class Cluster(LogMixin,db.Model, UserMixin):
