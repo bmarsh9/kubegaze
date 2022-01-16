@@ -33,7 +33,7 @@ class Event(LogMixin,db.Model, UserMixin):
               <div class="accordion-item mb-2 bg-dark rounded-2">
                 <h2 class="accordion-header" id="heading_{}">
                   <button class="accordion-button collapsed text-secondary bg-dark d-block" type="button" data-bs-toggle="collapse" data-bs-target="#event_{}" aria-expanded="false" aria-controls="event_{}">
-                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere"></i></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3">{}</div><div class="ms-auto subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
+                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere"></i></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3">{}</div><div class="ms-auto small subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
                   </button>
                 </h2>
                 <div id="event_{}" class="accordion-collapse collapse" aria-labelledby="heading_{}" data-bs-parent="#event_{}">
@@ -43,8 +43,7 @@ class Event(LogMixin,db.Model, UserMixin):
                         <div class="col-6">
                           <div class="card bg-light">
                               <div class="card-header">
-                                <h3 class="card-title">Event Spec</h3>
-                                <div class="card-actions"><i class="ti ti-apple icon"></i></div>
+                                <h3 class="card-title">Event</h3>
                               </div>
                               <div class="card-body">
                                 <pre>{}</pre>
@@ -52,41 +51,7 @@ class Event(LogMixin,db.Model, UserMixin):
                           </div>
                         </div>
                         <div class="col-6">
-                          <div class="card bg-dark">
-                              <div class="card-header">
-                                <h3 class="card-title text-cyan">Details</h3>
-                                <div class="card-actions"><i class="ti ti-notes icon"></i></div>
-                              </div>
-                              <div class="card-body">
-                                  <div class="table-responsive rounded-2">
-                                    <table class="table table-vcenter">
-                                      <thead class="bg-secondary">
-                                        <tr>
-                                          <th class="w-1 text-white">Key</th>
-                                          <th class="text-white">Value</th>
-                                          <th class="w-1"><i class="ti ti-external-link text-white"></i></th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td class="bg-secondary text-white subheader">Added</td>
-                                          <td class="text-muted subheader">
-                                            test
-                                          </td>
-                                          <td></td>
-                                        </tr>
-                                        <tr>
-                                          <td class="bg-secondary text-white subheader">Kind</td>
-                                          <td class="text-muted subheader">
-                                            test
-                                          </td>
-                                          <td></td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </div>
-                              </div>
-                          </div>
+                          test
                         </div>
                       </div>
                     </div>

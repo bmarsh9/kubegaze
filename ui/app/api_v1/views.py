@@ -25,7 +25,8 @@ def post_events_from_cluster(id):
     cluster = Cluster.query.get(id)
     if not cluster:
         return jsonify({"message":"cluster not found"}),404
-    cluster.events.append(Event(data=request.get_json()))
+    data = request.get_json()
+    cluster.events.append(Event(uid=data["request"]["uid"],kind=data["request"]["kind"]["kind"],data=data))
     db.session.commit()
     return jsonify({"message":"ok"})
 
