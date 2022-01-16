@@ -136,7 +136,7 @@ class Event(LogMixin,db.Model, UserMixin):
 
     @staticmethod
     def get_events_from_api_query(date_added=None,operations=[],tags=[],
-        name=None,namespace=None,date_sort=None,last=0):
+        name=None,namespace=None,date_sort="gt",last=0):
 #haaaaaaa
         data = {"last":0,"events":[]}
         _query = Event.query
@@ -147,6 +147,7 @@ class Event(LogMixin,db.Model, UserMixin):
             search = "%{}%".format(namespace)
             _query = _query.filter(Event.namespace.ilike(search))
         if last:
+            data["last"] = last
             _query = _query.filter(Event.id > last)
         if date_added:
             dt = arrow.get(date_added).datetime
@@ -168,7 +169,6 @@ class Event(LogMixin,db.Model, UserMixin):
             if event == events[-1]:
                 data["last"] = event.id
         return data
-
 
 class Cluster(LogMixin,db.Model, UserMixin):
     __tablename__ = 'clusters'

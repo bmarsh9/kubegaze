@@ -95,6 +95,18 @@ ul.chosen-choices {
       <div class="subheader mb-2">Limit Record</div>
       <input type="number" class="form-control subheader {% if filters["limit"]%}is-valid{%endif%}" id="limit" name="limit" value="{% if filters["limit"]%}{{filters["limit"]}}{%endif%}" autocomplete="off" placeholder="limit">
     </div>
+    <div class="col-auto mb-2">
+      <div>
+        <label class="row">
+          <span class="col mb-2 mt-2">Live Updates</span>
+          <span class="col-auto mb-2 mt-2">
+            <label class="form-check form-check-single form-switch">
+              <input id="update" class="form-check-input" type="checkbox" {% if filters["update"]%}checked=""{%endif%}>
+            </label>
+          </span>
+        </label>
+      </div>
+    </div>
     <div class="col-auto ms-auto">
       <div class="btn-list">
         <span class="d-none d-sm-inline">
@@ -119,6 +131,7 @@ ul.chosen-choices {
     var name = $("#name").val()
     var namespace = $("#namespace").val()
     var limit = $("#limit").val()
+    var update = $("#update").is(":checked")
     var date_added = $("#datepicker-icon-prepend").val()
     var date_sort = $("#date_sort").val()
     var tags = $("#filter-tags").val()
@@ -130,6 +143,12 @@ ul.chosen-choices {
     if (namespace) {
         dict.namespace = namespace;
     };
+    if (update) {
+        dict.update = 1;
+    } else {
+        dict.update = 0;
+    };
+    
 //    if (limit) {
 //        dict.limit = limit;
 //    };
@@ -166,27 +185,29 @@ ul.chosen-choices {
 //haaaaaa
           $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow" role="status"></div>');
           $.ajax({
-            //url: "/api/v1/events?last="+last,
-            url: "/api/v1/events?"+"{{query_string|safe}}",
+            url: "/api/v1/events?"+"{{query_string|safe}}"+"&last="+last,
             success: function(data) {
               console.log("adding "+data["events"].length+" events")
               if (data["events"].length) {
                 notify_js("Adding "+data["events"].length+" new events", type = "success",time=1000,placement={from:"bottom",align:"right"})
+                for (var i = 0; i < data["events"].length; i++) {
+                  $("#events").prepend(data["events"][i].html)
+                };
               };
-              for (var i = 0; i < data["events"].length; i++) {
-                $("#events").prepend(data["events"][i].html)
-              };
-              $("#loading").html("")
+              $("#loading").empty()
             },
             complete: function(event,xhr,options) {
+              if ({{filters["update"]}}) {
+                console.log("loading more events: "+event.responseJSON.last)
+                setTimeout(function() {
+                  worker(event.responseJSON.last);
+                }, 5000)
+              }
               return
-              console.log("loading more events: "+event.responseJSON.last)
-              setTimeout(function() {
-                worker(event.responseJSON.last);
-              }, 5000)
             },
             error: function (request, status, error) {
               console.log("error")
+              $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow text-red" role="status"></div>');
             }
           });
         })();

@@ -13,6 +13,7 @@ def home():
     name = request.args.get('name', None, type=str)
     namespace = request.args.get('namespace', None, type=str)
     limit = request.args.get('limit', 50, type=int)
+    update = request.args.get('update', 1, type=int)
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
@@ -22,7 +23,7 @@ def home():
     tags = request.args.getlist('tags')
     filters = {"name":name,"namespace":namespace,"tags":tags,
         "operations":operations,"date_added":date_added,"date_sort":date_sort,
-        "limit":limit
+        "limit":limit,"update":update
     }
     operation_list = Event.get_operations_in_list()
     tags = Tag.query.all()

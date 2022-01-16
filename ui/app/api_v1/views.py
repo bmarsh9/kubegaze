@@ -29,9 +29,9 @@ def post_events_from_cluster(id):
     event = Event(uid=data["request"]["uid"],
         apiversion=data["apiVersion"],
         kind=data["request"]["kind"]["kind"],
-        name=data["request"]["name"],
-        namespace=data["request"]["namespace"],
-        operation=data["request"]["operation"],
+        name=data["request"].get("name"),
+        namespace=data["request"].get("namespace"),
+        operation=data["request"].get("operation"),
         data=data
     )
     cluster.events.append(event)
@@ -45,15 +45,15 @@ def get_events():
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
+#    print(request.args.get('last', 0, type=int))
     events = Event.get_events_from_api_query(
         name=request.args.get('name', None, type=str),
         namespace=request.args.get('namespace', None, type=str),
         operations=request.args.getlist('operations'),
         tags=request.args.getlist('tags'),
-        date_sort=request.args.get('date_sort', None, type=str),
+        date_sort=request.args.get('date_sort', "gt", type=str),
         date_added=date_added,
         last=request.args.get('last', 0, type=int),
         #limit=request.args.get('limit', 50, type=int),
-
     )
     return jsonify(events)
