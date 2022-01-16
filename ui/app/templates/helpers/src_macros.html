@@ -1,4 +1,4 @@
-{% macro filehelper(datatables=False,chartjs=False,counter=False,sparkline=False,d3=False,select=False,apex=False,datepicker=False,apex_history=False,requests=False,slider=False,notify_js=False) -%}
+{% macro filehelper(datatables=False,chartjs=False,counter=False,sparkline=False,select=False,apex=False,datepicker=False,apex_history=False,requests=False,slider=False,notify_js=False,old_select=False,uri=False) -%}
   {% if datatables %}
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
@@ -22,13 +22,16 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
   {% endif %}
+  {% if old_select %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-old-chosen.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chosen.css') }}"/>
+  {% endif %}
   {% if sparkline %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
     <script src="{{url_for('static',filename='assets/js/sparkline_template.js')}}"></script>
   {% endif %}
-  {% if d3 %}
-    <!-- D3 Map -->
-    <script src="{{url_for('static',filename='js/d3.min.js')}}"></script>
+  {% if uri %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.19.6/URI.min.js" integrity="sha512-W3prM2BMb4lI5HRwh1jFzURjpTueG9Tt3GK9q1Vb8w3T6SjZSDpyj6svha8pojrRPEDrz30LpnMLcFzgPkrmTQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   {% endif %}
   {% if select %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.7.0/chosen.jquery.min.js"></script>
@@ -40,8 +43,7 @@
   {% endif %}
 
   {% if datepicker %}
-      <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-      <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+      <script src="{{url_for('static',filename='js/litepicker.js')}}"></script>
   {% endif %}
 
   {% if apex_history %}

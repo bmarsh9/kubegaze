@@ -8,10 +8,6 @@
 ul.chosen-choices {
   background-color:transparent !important;
 }
-.scroll {
-    max-height: 500px;
-    overflow-y: scroll;
-}
 </style>
 {% endblock %}
 
@@ -32,16 +28,14 @@ ul.chosen-choices {
 
 {%block content%}
   <div class="row row-cards mb-3">
-  <div class="col-2">
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Before/After Date</div>
+
+    <div class="col-auto">
       <select id="date_sort" class="form-select subheader {% if filters["date_sorrt"]%}is-valid{%endif%}">
         <option value="gt" {%if filters["date_sort"]=="gt"%}selected{%endif%}>After</option>
         <option value="lt" {%if filters["date_sort"]=="lt"%}selected{%endif%}>Before</option>
       </select>
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Sort by Date</div>
+    <div class="col-2">
       <div class="input-icon">
         <span class="input-icon-addon">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -57,31 +51,25 @@ ul.chosen-choices {
         <input autocomplete="off" class="form-control subheader {% if filters["date_added"]%}is-valid{%endif%}" placeholder="Date" value="{% if filters["date_added"]%}{{filters["date_added"]}}{%endif%}" id="datepicker-icon-prepend"/>
       </div>
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Filter by Name</div>
+    <div class="col-2">
       <input type="text" class="form-control subheader {% if filters["name"]%}is-valid{%endif%}" id="name" name="name" value="{% if filters["name"]%}{{filters["name"]}}{%endif%}" autocomplete="off" placeholder="name">
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Filter by Namespace</div>
+    <div class="col-2">
       <input type="text" class="form-control subheader {% if filters["namespace"]%}is-valid{%endif%}" id="namespace" name="namespace" value="{% if filters["namespace"]%}{{filters["namespace"]}}{%endif%}" autocomplete="off" placeholder="namespace">
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Operations</div>
-      <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
-      <select size="4" autocomplete="off" multiple="multiple" name="operations[]" class="form-control subheader {% if filters["operations"]%}is-valid{%endif%}" id="filter-operations" data-placeholder="operations">
-      {% for op in operation_list %}
-        {%if op in filters["operations"] %}
-        <option value="{{op|lower}}" selected>{{op|capitalize}}</option>
+    <div class="col-2">
+      <select size="4" multiple="multiple" name="operations[]" class="form-control subheader {% if filters["operations"]%}is-valid{%endif%}" id="filter-operations" data-placeholder="operations">
+      {% for user in users %}
+        {%if user.id|string in filters["users"] %}
+        <option value="{{user.id}}" selected>{{user.username|capitalize}}</option>
         {%else%}
-        <option value="{{op|lower}}">{{op|capitalize}}</option>
+        <option value="{{user.id}}">{{user.username|capitalize}}</option>
         {%endif%}
       {% endfor %}
       </select>
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Tags</div>
-      <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
-      <select size="4" autocomplete="off" multiple="multiple" name="tags[]" class="form-control subheader {% if filters["tags"]%}is-valid{%endif%}" id="filter-tags" data-placeholder="Tags">
+    <div class="col-2">
+      <select size="4" multiple="multiple" name="tags[]" class="form-control subheader {% if filters["tags"]%}is-valid{%endif%}" id="filter-tags" data-placeholder="Tags">
       {% for tag in tags %}
         {%if tag.name in filters["tags"] %}
         <option value="{{tag.name}}" selected>{{tag.name|capitalize}}</option>
@@ -91,24 +79,18 @@ ul.chosen-choices {
       {% endfor %}
       </select>
     </div>
-    <div class="col-auto mb-2">
-      <div class="subheader mb-2">Limit Record</div>
-      <input type="number" class="form-control subheader {% if filters["limit"]%}is-valid{%endif%}" id="limit" name="limit" value="{% if filters["limit"]%}{{filters["limit"]}}{%endif%}" autocomplete="off" placeholder="limit">
-    </div>
     <div class="col-auto ms-auto">
       <div class="btn-list">
         <span class="d-none d-sm-inline">
-        <a href="#" onclick="deleteFilters(this);" class="btn btn-outline-danger btn-icon" aria-label="Button"><i class="ti ti-trash mr-1"></i>Trash</a>
+        <a href="#" onclick="deleteFilters(this);" class="btn btn-outline-danger btn-icon" aria-label="Button"><i class="ti ti-trash"></i></a>
         </span>
-        <a href="#" onclick="postFilters(this);" class="btn btn-outline-cyan btn-icon" aria-label="Button"><i class="ti ti-filter mr-1"></i>Filter</a>
+        <a href="#" onclick="postFilters(this);" class="btn btn-outline-cyan btn-icon" aria-label="Button"><i class="ti ti-filter"></i></a>
       </div>
     </div>
   </div>
-  <div class="col-10">
-    <div id="loading" class="mb-2 text-center"></div>
-    <div id="events" class="accordion">
+  <div class="row row-cards mb-3">
+    <div id="events" class="accordion" id="accordionExample">
     </div>
-  </div>
   </div>
 {%endblock%}
 
@@ -118,21 +100,16 @@ ul.chosen-choices {
     var dict = {};
     var name = $("#name").val()
     var namespace = $("#namespace").val()
-    var limit = $("#limit").val()
     var date_added = $("#datepicker-icon-prepend").val()
     var date_sort = $("#date_sort").val()
     var tags = $("#filter-tags").val()
     var operations = $("#filter-operations").val()
-
     if (name) {
         dict.name = name;
     };
     if (namespace) {
         dict.namespace = namespace;
     };
-//    if (limit) {
-//        dict.limit = limit;
-//    };
     if (date_added) {
         dict.date_added = date_added;
     };
@@ -146,9 +123,8 @@ ul.chosen-choices {
         dict.date_sort = date_sort;
     };
     var url = new URI(document.location.href.toString());
+    console.log(url)
     url.query(dict)
-    //console.log(url._parts.query)
-    //console.log(url.toString())
     window.location.href = url;
   }
   function deleteFilters(e) {
@@ -160,14 +136,22 @@ ul.chosen-choices {
   $('#filter-operations').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
   $('#filter-tags').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
 </script>
+<script>
+  new Litepicker({
+    element: document.getElementById('datepicker-icon-prepend'),
+    buttonText: {
+      previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>`,
+      nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>`,
+    },
+  });
+</script>
   <script>
     $(document).ready(function() {
         (function worker(last=0) {
-//haaaaaa
-          $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow" role="status"></div>');
           $.ajax({
-            //url: "/api/v1/events?last="+last,
-            url: "/api/v1/events?"+"{{query_string|safe}}",
+            url: "/api/v1/events?last="+last,
             success: function(data) {
               console.log("adding "+data["events"].length+" events")
               if (data["events"].length) {
@@ -176,10 +160,8 @@ ul.chosen-choices {
               for (var i = 0; i < data["events"].length; i++) {
                 $("#events").prepend(data["events"][i].html)
               };
-              $("#loading").html("")
             },
             complete: function(event,xhr,options) {
-              return
               console.log("loading more events: "+event.responseJSON.last)
               setTimeout(function() {
                 worker(event.responseJSON.last);
@@ -190,17 +172,6 @@ ul.chosen-choices {
             }
           });
         })();
-    });
-  </script>
-  <script>
-    new Litepicker({
-      element: document.getElementById('datepicker-icon-prepend'),
-      buttonText: {
-        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>`,
-        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>`,
-      },
     });
   </script>
 {% endblock %}

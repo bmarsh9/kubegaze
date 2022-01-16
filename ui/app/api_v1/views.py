@@ -26,36 +26,34 @@ def post_events_from_cluster(id):
     if not cluster:
         return jsonify({"message":"cluster not found"}),404
     data = request.get_json()
-    cluster.events.append(Event(uid=data["request"]["uid"],kind=data["request"]["kind"]["kind"],data=data))
+    event = Event(uid=data["request"]["uid"],
+        apiversion=data["apiVersion"],
+        kind=data["request"]["kind"]["kind"],
+        name=data["request"]["name"],
+        namespace=data["request"]["namespace"],
+        operation=data["request"]["operation"],
+        data=data
+    )
+    cluster.events.append(event)
     db.session.commit()
     return jsonify({"message":"ok"})
 
 @api.route('/events', methods=['GET'])
 @login_required
 def get_events():
-    since = request.args.get('since', 100, type=int)
-    latest = request.args.get('latest', 1, type=int)
+    #haaaa
+    date_added = request.args.get('date_added', None, type=str)
+    if not date_added:
+        date_added = datetime.now() - timedelta(hours = 24)
+    events = Event.get_events_from_api_query(
+        name=request.args.get('name', None, type=str),
+        namespace=request.args.get('namespace', None, type=str),
+        operations=request.args.getlist('operations'),
+        tags=request.args.getlist('tags'),
+        date_sort=request.args.get('date_sort', None, type=str),
+        date_added=date_added,
+        last=request.args.get('last', 0, type=int),
+        #limit=request.args.get('limit', 50, type=int),
 
-    data = {
-        "last":request.args.get('last', 0, type=int),
-        "events":[]
-    }
-    _query = Event.query
-    if latest:
-        flip=True
-        _query = _query.order_by(Event.id.desc())
-    else:
-        flip=False
-        from_date = datetime.now() - timedelta(minutes=since)
-        _query = _query.filter(Event.date_added >= from_date)
-    if data["last"]:
-        _query = _query.filter(Event.id > data["last"])
-
-    events = _query.limit(request.args.get("limit",50)).all()
-    if flip:
-        events = events[::-1]
-    for event in events:
-        data["events"].append({"id":event.id,"html":event.to_list()})
-        if event  == events[-1]: #last element
-            data["last"] = event.id
-    return jsonify(data)
+    )
+    return jsonify(events)
