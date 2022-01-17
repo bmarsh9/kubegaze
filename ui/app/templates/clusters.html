@@ -1,21 +1,70 @@
 {% extends "layouts/condensed.html" %}
 
-{%block contentHeader_pretitle%}Overview{%endblock%}
-{%block contentHeader_title%}Vertical Layout{%endblock%}
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True) }}
+{% endblock %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        clusters
+      </div>
+      <h2 class="page-title">
+        View Clusters
+      </h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.add_rule")}}" class="btn bg-cyan-lt">
+            Add Cluster
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}
 
 {%block content%}
   <div class="row row-cards">
     <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Header title</h3>
+            <h3 class="card-title">Clusters</h3>
           </div>
           <div class="card-body">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam deleniti fugit incidunt, iste, itaque minima
-              neque pariatur perferendis sed suscipit velit vitae voluptatem.</p>
+            <div class="table-responsive">
+              <table class="table table-vcenter table-bordered" id="example" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th class="w-1">Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cluster in clusters %}
+                  <tr>
+                    <td class="subheader">{{cluster.label}}</td>
+                    <td class="text-center"><a href="{{url_for("main.view_cluster",id=cluster.id)}}"><i class="ti ti-edit"></i></a></td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+              </table>
           </div>
         </div>
     </div>
   </div>
 {%endblock%}
 
+{%block extrajs%}
+<script>
+  $(document).ready(function() {
+    $('#example').DataTable({"pageLength":25,"order": [[ 0, "desc" ]]});
+  } );
+</script>
+{% endblock %}

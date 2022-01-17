@@ -15,6 +15,18 @@ def home():
 @main.route('/clusters', methods=['GET'])
 @login_required
 def clusters():
+    clusters = Cluster.query.all()
+    return render_template("clusters.html",clusters=clusters)
+
+@main.route('/clusters/<int:id>', methods=['GET'])
+@login_required
+def view_cluster(id):
+    cluster = Cluster.query.get(id)
+    return render_template("view_cluster.html",cluster=cluster)
+
+@main.route('/jobs', methods=['GET'])
+@login_required
+def jobs():
     return render_template("clusters.html")
 
 @main.route('/rules', methods=['GET'])
