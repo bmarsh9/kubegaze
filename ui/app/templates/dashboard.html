@@ -23,8 +23,17 @@ ul.chosen-choices {
         Clusters
       </div>
       <h2 class="page-title">
-        Cluster Events
+        Cluster Events<span id="eventCount" class="badge bg-cyan-lt ml-2">0</span>
       </h2>
+    </div>
+    <div class="col-auto ms-auto d-print-none">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="#" class="btn btn-white">
+            Dashboard
+          </a>
+        </span>
+      </div>
     </div>
   </div>
 </div>
@@ -66,7 +75,7 @@ ul.chosen-choices {
       <input type="text" class="form-control subheader {% if filters["namespace"]%}is-valid{%endif%}" id="namespace" name="namespace" value="{% if filters["namespace"]%}{{filters["namespace"]}}{%endif%}" autocomplete="off" placeholder="namespace">
     </div>
     <div class="col-auto mb-2">
-      <div class="subheader mb-2">Operations</div>
+      <div class="subheader mb-2">Operations (or)</div>
       <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
       <select size="4" autocomplete="off" multiple="multiple" name="operations[]" class="form-control subheader {% if filters["operations"]%}is-valid{%endif%}" id="filter-operations" data-placeholder="operations">
       {% for op in operation_list %}
@@ -79,7 +88,7 @@ ul.chosen-choices {
       </select>
     </div>
     <div class="col-auto mb-2">
-      <div class="subheader mb-2">Tags</div>
+      <div class="subheader mb-2">Tags (and)</div>
       <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
       <select size="4" autocomplete="off" multiple="multiple" name="tags[]" class="form-control subheader {% if filters["tags"]%}is-valid{%endif%}" id="filter-tags" data-placeholder="Tags">
       {% for tag in tags %}
@@ -147,11 +156,10 @@ ul.chosen-choices {
         dict.update = 1;
     } else {
         dict.update = 0;
+    };    
+    if (limit) {
+        dict.limit = limit;
     };
-    
-//    if (limit) {
-//        dict.limit = limit;
-//    };
     if (date_added) {
         dict.date_added = date_added;
     };
@@ -182,15 +190,17 @@ ul.chosen-choices {
   <script>
     $(document).ready(function() {
         (function worker(last=0) {
-//haaaaaa
           $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow" role="status"></div>');
           $.ajax({
             url: "/api/v1/events?"+"{{query_string|safe}}"+"&last="+last,
             success: function(data) {
-              console.log("adding "+data["events"].length+" events")
-              if (data["events"].length) {
-                notify_js("Adding "+data["events"].length+" new events", type = "success",time=1000,placement={from:"bottom",align:"right"})
-                for (var i = 0; i < data["events"].length; i++) {
+              var eventCount = data["events"].length;
+              console.log("adding "+eventCount+" events")
+              if (eventCount) {
+                $("#events").prepend('<div class="hr-text">Added '+eventCount+' events</div>')
+                $("#eventCount").html(eventCount+parseInt($("#eventCount").html()))
+                notify_js("Adding "+eventCount+" new events", type = "success",time=1000,placement={from:"bottom",align:"right"})
+                for (var i = 0; i < eventCount; i++) {
                   $("#events").prepend(data["events"][i].html)
                 };
               };

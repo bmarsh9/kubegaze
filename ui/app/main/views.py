@@ -17,7 +17,6 @@ def home():
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
-
     date_sort = request.args.get('date_sort', "gt", type=str)
     operations = request.args.getlist('operations')
     tags = request.args.getlist('tags')
@@ -26,7 +25,7 @@ def home():
         "limit":limit,"update":update
     }
     operation_list = Event.get_operations_in_list()
-    tags = Tag.query.all()
+    tags = Tag.query.filter(Tag.name != None).all()
     query_string = request.query_string.decode("utf-8")
     return render_template("dashboard.html",filters=filters,
         operation_list=operation_list,tags=tags,query_string=query_string)

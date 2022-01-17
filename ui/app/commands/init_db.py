@@ -17,6 +17,7 @@ def init_db():
     db.create_all()
     create_users()
     create_default_cluster()
+    create_default_tags()
 
 def create_users():
     """ Create users """
@@ -36,4 +37,11 @@ def create_users():
 def create_default_cluster():
     if not Cluster.query.first():
         Cluster.add()
+    return
+
+def create_default_tags():
+    for name in ["default"]:
+        tag = Tag(name=name)
+        db.session.add(tag)
+        db.session.commit()
     return

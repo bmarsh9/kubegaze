@@ -45,7 +45,6 @@ def get_events():
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
-#    print(request.args.get('last', 0, type=int))
     events = Event.get_events_from_api_query(
         name=request.args.get('name', None, type=str),
         namespace=request.args.get('namespace', None, type=str),
@@ -54,6 +53,6 @@ def get_events():
         date_sort=request.args.get('date_sort', "gt", type=str),
         date_added=date_added,
         last=request.args.get('last', 0, type=int),
-        #limit=request.args.get('limit', 50, type=int),
+        limit=request.args.get('limit', 50, type=int),
     )
     return jsonify(events)

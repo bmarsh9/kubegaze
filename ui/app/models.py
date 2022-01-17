@@ -18,13 +18,13 @@ class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.String())
-    kind = db.Column(db.String())
+    kind = db.Column(db.String(),default="unknown")
     apiversion = db.Column(db.String())
-    name = db.Column(db.String())
-    namespace = db.Column(db.String())
-    operation = db.Column(db.String())
+    name = db.Column(db.String(),default="unknown")
+    namespace = db.Column(db.String(),default="unknown")
+    operation = db.Column(db.String(),default="unknown")
     data = db.Column(db.JSON(),default={})
-    tags = db.relationship('Tag', secondary='assoc_tags')
+    tags = db.relationship('Tag', secondary='assoc_tags', lazy='dynamic')
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
@@ -136,8 +136,7 @@ class Event(LogMixin,db.Model, UserMixin):
 
     @staticmethod
     def get_events_from_api_query(date_added=None,operations=[],tags=[],
-        name=None,namespace=None,date_sort="gt",last=0):
-#haaaaaaa
+        name=None,namespace=None,date_sort="gt",last=0,limit=50):
         data = {"last":0,"events":[]}
         _query = Event.query
         if name:
@@ -146,6 +145,11 @@ class Event(LogMixin,db.Model, UserMixin):
         if namespace:
             search = "%{}%".format(namespace)
             _query = _query.filter(Event.namespace.ilike(search))
+        if operations:
+            _query = _query.filter(func.lower(Event.operation).in_(operations))
+        if tags:
+            for tag in tags:
+                _query = _query.filter(Event.tags.any(name=tag.lower()))
         if last:
             data["last"] = last
             _query = _query.filter(Event.id > last)
@@ -155,18 +159,11 @@ class Event(LogMixin,db.Model, UserMixin):
                 _query = _query.filter(Event.date_added <= dt)
             else:
                 _query = _query.filter(Event.date_added >= dt)
-        #events = _query.order_by(Event.id.desc()).limit(limit).all()
-        events = _query.order_by(Event.id.asc()).all()
 
-        # filter on tags and operations
-        for event in events:
-            if event.has_tags(tags):
-                if operations:
-                    if str(event.operation).lower() in operations:
-                        data["events"].append({"id":event.id,"html":event.to_list()})
-                else:
-                    data["events"].append({"id":event.id,"html":event.to_list()})
-            if event == events[-1]:
+        events = _query.order_by(Event.id.desc()).limit(limit).all()
+        for event in events[::-1]:
+            data["events"].append({"id":event.id,"html":event.to_list()})
+            if event == events[0]:
                 data["last"] = event.id
         return data
 
