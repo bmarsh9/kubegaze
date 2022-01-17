@@ -3,8 +3,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     #SERVER_NAME = "localhost"
-    APP_NAME = os.environ.get("APP_NAME","K8Audit")
-    APP_SUBTITLE = os.environ.get("APP_SUBTITLE","Workflows made easy")
+    APP_NAME = os.environ.get("APP_NAME","KubeGaze")
+    APP_SUBTITLE = os.environ.get("APP_SUBTITLE","Security monitoring tool for Kubernetes")
     CR_YEAR = os.environ.get("CR_YEAR","2021")
     VERSION = os.environ.get("VERSION","1.0.0")
 

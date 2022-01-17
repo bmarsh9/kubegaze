@@ -10,6 +10,11 @@ from datetime import datetime, timedelta
 @main.route('/', methods=['GET'])
 @login_required
 def home():
+    return render_template("dashboard.html")
+
+@main.route('/events', methods=['GET'])
+@login_required
+def events():
     name = request.args.get('name', None, type=str)
     namespace = request.args.get('namespace', None, type=str)
     limit = request.args.get('limit', 50, type=int)
@@ -27,7 +32,7 @@ def home():
     operation_list = Event.get_operations_in_list()
     tags = Tag.query.filter(Tag.name != None).all()
     query_string = request.query_string.decode("utf-8")
-    return render_template("dashboard.html",filters=filters,
+    return render_template("events.html",filters=filters,
         operation_list=operation_list,tags=tags,query_string=query_string)
 
 @main.route('/test', methods=['GET'])

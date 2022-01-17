@@ -71,7 +71,7 @@ class Event(LogMixin,db.Model, UserMixin):
               <div class="accordion-item mb-2 bg-dark rounded-2">
                 <h2 class="accordion-header" id="heading_{}">
                   <button class="accordion-button collapsed text-secondary bg-dark d-block" type="button" data-bs-toggle="collapse" data-bs-target="#event_{}" aria-expanded="false" aria-controls="event_{}">
-                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere"></i><br><small class="subheader">{}</small></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3" style="color:#a4a3a3;">{} / {}</div><div class="ms-auto subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
+                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere text-cyan"></i><br><small class="subheader">{}</small></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3" style="color:#a4a3a3;">{} / {}</div><div class="ms-auto subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
                   </button>
                 </h2>
                 <div id="event_{}" class="accordion-collapse collapse" aria-labelledby="heading_{}" data-bs-parent="#event_{}">

@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <link rel="icon" href="{{ url_for('static', filename='img/spate_icon.PNG') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/kubegaze_icon.png') }}">
     <title>{%block title%}{{config["APP_NAME"]|capitalize}}{%endblock%}</title>
     {% block include_jquery %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
@@ -40,13 +40,23 @@
           </button>
           <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
             <a href="{{url_for('main.home')}}">
-              <img src="{{ url_for('static', filename='img/spate_full.PNG') }}" width="100" height="22" alt="{{config["APP_NAME"]|capitalize}}">
+              <img src="{{ url_for('static', filename='img/kubegaze_full_invert_1.png') }}" width="100" height="22" alt="{{config["APP_NAME"]|capitalize}}">
             </a>
           </h1>
           <div class="collapse navbar-collapse" id="navbar-menu">
             <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
               <ul class="navbar-nav">
                 {%block navbar%}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for("main.events")}}">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-3d-cube-sphere icon"></i>
+                    </span>
+                    <span class="nav-link-title">
+                      Events
+                    </span>
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for("main.users")}}">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
