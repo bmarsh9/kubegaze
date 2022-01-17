@@ -9,10 +9,36 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSign
 from datetime import datetime
 from app.email import send_email
 from app import db, login
+from app.utils.code_template import default_rule_code
 import hashlib
 import arrow
 import json
 import os
+
+class Rule(LogMixin,db.Model, UserMixin):
+    __tablename__ = 'rules'
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(),nullable=False)
+    uuid = db.Column(db.String(),nullable=False,unique=True)
+    description = db.Column(db.String())
+    enabled = db.Column(db.Boolean, default=True)
+    code = db.Column(db.JSON(),default="{}")
+    clusters = db.relationship('Cluster', secondary='assoc_rules', lazy='dynamic')
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def add(uuid=None,label=None,description=None,code={}):
+        if not uuid:
+            uuid = str(generate_uuid())
+        if not label:
+            label = str(uuid)
+        if not code:
+            code = default_rule_code(name=uuid)
+        rule = Rule(uuid=str(uuid),label=label,description=description,code=code)
+        db.session.add(rule)
+        db.session.commit()
+        return rule
 
 class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
@@ -28,6 +54,24 @@ class Event(LogMixin,db.Model, UserMixin):
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    def to_json(self):
+        tags = []
+        for tag in self.tags.all():
+            tags.append(tag.name)
+        return {
+            "id":self.id,
+            "uid":self.uid,
+            "kind":self.kind,
+            "apiversion":self.apiversion,
+            "name":self.name,
+            "namespace":self.namespace,
+            "operation":self.operation,
+            "data":self.data,
+            "cluster_name":self.cluster.label,
+            "tags":tags,
+            "date_added":self.date_added
+        }
 
     def has_tags(self,search_tags):
         if not isinstance(search_tags,list):
@@ -342,6 +386,12 @@ class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
+class AssocRule(LogMixin,db.Model):
+    __tablename__ = 'assoc_rules'
+    id = db.Column(db.Integer(), primary_key=True)
+    rule_id = db.Column(db.Integer(), db.ForeignKey('rules.id', ondelete='CASCADE'))
+    cluster_id = db.Column(db.Integer(), db.ForeignKey('clusters.id', ondelete='CASCADE'))
 
 class AssocTag(LogMixin,db.Model):
     __tablename__ = 'assoc_tags'

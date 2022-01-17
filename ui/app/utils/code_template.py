@@ -1,0 +1,27 @@
+import os
+from flask import current_app
+
+'''
+Note: end-user can NOT edit the first three or the last three lines.
+Any comments or code placed in those lines can't be changed by end user
+'''
+
+def default_rule_code(name="code"):
+    return """def {}(input, **kwargs):
+    '''Place your custom code below.
+    Must be indented under this function.'''
+
+
+    '''Default return is True. If you want to return something else, do so above.
+    If the return is False, the workflow will NOT proceed.'''
+    return input
+    """.format(name)
+
+def default_router_code(workflow_dir):
+    path = os.path.join(current_app.config["BASE_DIR"],"app/utils/code_library/router_code.txt")
+    if os.path.exists(path):
+        with open(path) as f:
+            contents = f.read()
+#            return contents.replace(str(current_app.config.get("BLOCK_TIMEOUT",30)),"BLOCK_TIMEOUT_PARAMETER")
+            return contents.replace("BLOCK_TIMEOUT_PARAMETER",str(current_app.config.get("BLOCK_TIMEOUT",30)))
+    return ""

@@ -12,6 +12,30 @@ from datetime import datetime, timedelta
 def home():
     return render_template("dashboard.html")
 
+@main.route('/clusters', methods=['GET'])
+@login_required
+def clusters():
+    return render_template("clusters.html")
+
+@main.route('/rules', methods=['GET'])
+@login_required
+def rules():
+    rules = Rule.query.all()
+    return render_template("rules.html",rules=rules)
+
+@main.route('/rules/<int:id>', methods=['GET'])
+@login_required
+def view_rule(id):
+    rule = Rule.query.get(id)
+    return render_template("view_rule.html",rule=rule)
+
+@main.route('/rules/add', methods=['GET','POST'])
+@login_required
+def add_rule():
+    new_rule = Rule.add()
+    flash("Added Rule")
+    return redirect(url_for("main.view_rule",id=new_rule.id))
+
 @main.route('/events', methods=['GET'])
 @login_required
 def events():
@@ -39,11 +63,6 @@ def events():
 @login_required
 def test():
     return render_template("test.html")
-
-@main.route('/clusters', methods=['GET'])
-@login_required
-def clusters():
-    return render_template("dashboard.html")
 
 @main.route('/clusters/<int:id>/token', methods=['GET'])
 @login_required

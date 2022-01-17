@@ -56,3 +56,16 @@ def get_events():
         limit=request.args.get('limit', 50, type=int),
     )
     return jsonify(events)
+
+@api.route('/rules/<int:id>/code', methods=['GET'])
+def get_code_for_rule(id):
+    rule = Rule.query.get(id)
+    return jsonify({"code":rule.code})
+
+@api.route('/rules/<int:id>/code', methods=['PUT'])
+def save_code_for_rule(id):
+    rule = Rule.query.get(id)
+    data = request.get_json()
+    rule.code = data["code"]
+    db.session.commit()
+    return jsonify({"code":rule.code})

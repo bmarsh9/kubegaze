@@ -1,0 +1,72 @@
+{% extends "layouts/condensed.html" %}
+
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True) }}
+{% endblock %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        Rules
+      </div>
+      <h2 class="page-title">
+        View Rules
+      </h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.add_rule")}}" class="btn bg-cyan-lt">
+            Add Rule
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Edit Rule</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-bordered" id="example" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Values</th>
+                    <th class="w-1">Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rule in rules %}
+                  <tr>
+                    <td class="subheader">{{rule.label}}</td>
+                    <td class="text-muted"><span class="badge bg-blue-lt">test</span></td>
+                    <td class="text-center"><a href="{{url_for("main.view_rule",id=rule.id)}}"><i class="ti ti-edit"></i></a></td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+              </table>
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}
+
+{%block extrajs%}
+<script>
+  $(document).ready(function() {
+    $('#example').DataTable({"pageLength":25,"order": [[ 0, "desc" ]]});
+  } );
+</script>
+{% endblock %}

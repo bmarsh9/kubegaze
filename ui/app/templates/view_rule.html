@@ -1,0 +1,99 @@
+{% extends "layouts/condensed.html" %}
+{% block head %}
+<script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" ></script>
+{%endblock%}
+{%block contentHeader_pretitle%}<a href="{{url_for("main.rules")}}">rules</a>{%endblock%}
+{%block contentHeader_title%}Rule Editor{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Edit Rule {{rule.label}}</h3>
+          </div>
+          <div class="card-body">
+            <div id="code-editor-wrapper" class="col-12">
+              <div id="code-editor"></div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="#" id="saveCode" class="btn bg-cyan-lt">Save</div></a>
+          </div>
+    </div>
+  </div>
+{%endblock%}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {
+    $("#saveCode").click(function(){
+
+      var editor = ace.edit("code-editor");
+      
+  $.ajax({
+    url: "/api/v1/rules/{{rule.id}}/code",
+    type: "PUT",
+    data: JSON.stringify({
+      "code":editor.getValue(),
+    }),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success: function (response) {
+      notify_js("Saved successfully",type="primary",time=1000)
+      //$("#modalSaveButton").html('<button onclick=saveOperatorCode("'+operatorName+'") type="button" class="btn subheader text-white bg-primary">Save</button>')
+      return true;
+    },
+    error: function (request, status, error) {
+      notify_js("Hmm. Something went wrong. Your data may not have saved!", type="danger",time=1000)
+      return false;
+    }
+  });
+    });
+function readOnlyLines(editor) {
+  editor.commands.on("exec", function(e) {
+    var rowCol = editor.selection.getCursor();
+    var last_3 = editor.session.getLength() - 5
+    if (rowCol.row < 3 || rowCol.row > last_3) {
+      editor.gotoLine(3);
+      editor.navigateLineEnd()
+      if (e.args === "\n") {
+        console.log("new line")
+      } else {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+}
+  $.ajax({
+    url: "/api/v1/rules/{{rule.id}}/code",
+    type: "GET",
+    success: function (response) {
+      var editor = ace.edit("code-editor");
+      editor.setOptions({
+        maxLines: 25,
+        minLines: 25,
+        autoScrollEditorIntoView: true,
+      });
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/python");
+      editor.session.setTabSize(4);
+      editor.session.setUseWrapMode(true);
+      //editor.setReadOnly(true);  // false to make it editable
+      editor.setValue(response["code"]);
+      readOnlyLines(editor);
+
+      editor.getSession().on('change', function(){
+        console.log("changed")
+        //$("#modalSaveButton").html('<button onclick=saveOperatorCode("'+operatorName+'") type="button" class="btn subheader bg-red text-white"><span style="width:1rem;height:1rem" class="spinner-grow text-white mr-2" role="status"></span>Save</button>')
+      })
+    },
+    error: function (request, status, error) {
+      console.log("error")
+      return false;
+    }
+  });
+    });
+  </script>
+{% endblock %}
