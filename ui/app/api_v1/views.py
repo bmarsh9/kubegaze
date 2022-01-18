@@ -78,6 +78,13 @@ def save_code_for_rule(id):
     db.session.commit()
     return jsonify({"code":rule.code})
 
+@api.route('/tags/<int:id>/color/<string:color>', methods=['PUT'])
+def update_color_for_tag(id,color):
+    tag = Tag.query.get(id)
+    tag.color = color
+    db.session.commit()
+    return jsonify({"message":"ok"})
+
 @api.route('/rules', methods=['GET'])
 def get_rules():
     data = []
@@ -88,13 +95,19 @@ def get_rules():
 @api.route('/events', methods=['GET'])
 def get_events():
     data = []
-    for event in Event.query.order_by(Event.id.desc()).limit(10).all():
+    for event in Event.query.filter(Event.seen == False).order_by(Event.id.desc()).limit(10).all():
         data.append(event.to_json())
     return jsonify(data)
 
 @api.route('/hits', methods=['POST'])
 def post_hits():
-    data = []
-    for rule in Rule.query.all():
-        data.append(rule.to_json())
-    return jsonify(data)
+    data = request.get_json()
+    for record in data:
+        event = Event.query.get(record["id"])
+        if event:
+            event.seen = True
+            for alert in record["hits"]:
+                event.alerts.append(Alert(evidence=alert["evidence"],
+                    rule_id=alert["rule_id"],cluster_id=event.cluster_id))
+    db.session.commit()
+    return jsonify({"message":"ok"})

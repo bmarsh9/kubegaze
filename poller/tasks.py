@@ -1,33 +1,7 @@
-import importlib
 import requests
 import os
-import glob
 import json
-import timeout_decorator
-
-@timeout_decorator.timeout(5)
-def execute_rule(rule,event):
-    uuid = os.path.splitext(os.path.basename(rule))[0]
-    module_name = "{}.{}".format("rules",uuid)
-    module = importlib.import_module(module_name)
-    return getattr(module,"uuid_{}".format(uuid))(event)
-
-#@timeout_decorator.timeout(BLOCK_TIMEOUT)
-def execute_event_against_rules(event,logging,**kwargs):
-    hits = []
-    for rule in glob.glob("rules/*.py"):
-        try:
-            result = execute_rule(rule,event)
-            if result["hit"]:
-                hits.append(result)
-        except Exception as e:
-            logging.warning("Exception:{} while executing rule:{} for event:{}".format(str(e),rule,event["uid"]))
-    return hits
-
-def clean_rules_directory():
-    for rule in glob.glob("rules/*.py"):
-       os.remove(rule)
-    return True
+from utils import helpers
 
 def get_rules(app, logging):
     if not app.UI_HOST:
@@ -44,7 +18,7 @@ def get_rules(app, logging):
             rules.status_code,rules.text))
         return False
     logging.debug("Gathered {} rules from {}".format(len(rules.json()),app.UI_HOST))
-    clean_rules_directory()
+    helpers.clean_rules_directory()
     for rule in rules.json():
         if rule["enabled"]:
             with open("rules/{}.py".format(rule["uuid"]),"w") as f:
@@ -69,20 +43,22 @@ def execute_rules(app, logging):
         logging.warning("Unable to gather rules from {}. Status code: {}. Warning:{}".format(events_url,
             events.status_code,events.text))
         return False
+    logging.debug("Gathered {} events".format(len(events.json())))
     for event in events.json():
 #haaaaaaa
         logging.debug("Running event:{} against rules".format(event["uid"]))
         # execute all rules against the event
-        hits = execute_event_against_rules(event,logging)
-        if hits:
-            logging.debug("Event:{} has {} hits".format(event["uid"],len(hits)))
-            data.append({"uid":event["uid"],"hits":hits})
-    """
+        hits = helpers.execute_event_against_rules(event,logging)
+        logging.debug("Event:{} has {} hits".format(event["uid"],len(hits)))
+        data.append({"id":event["id"],"count":len(hits),"hits":hits})
+    if not data:
+        return True
     # post results
     logging.debug("Posting results to {}".format(results_url))
-    results = requests.post(url=results_url,verify=verify)
+    results = requests.post(url=results_url,json=data,verify=verify)
     if not results.ok:
         logging.warning("Unable to POST results to {}. Status code: {}. Warning:{}".format(results_url,
             results.status_code,results.text))
         return False
-    """
+    print(results.json())
+    return True

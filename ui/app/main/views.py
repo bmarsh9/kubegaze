@@ -29,6 +29,12 @@ def view_cluster(id):
 def jobs():
     return render_template("clusters.html")
 
+@main.route('/tags', methods=['GET'])
+@login_required
+def tags():
+    tags = Tag.query.all()
+    return render_template("tags.html",tags=tags)
+
 @main.route('/rules', methods=['GET'])
 @login_required
 def rules():
@@ -39,8 +45,10 @@ def rules():
 @login_required
 def view_rule(id):
     rule = Rule.query.get(id)
+    tags = Tag.query.all()
     clusters = Cluster.query.all()
-    return render_template("view_rule.html",rule=rule,clusters=clusters)
+    return render_template("view_rule.html",rule=rule,
+        tags=tags,clusters=clusters)
 
 @main.route('/rules/<int:id>/settings', methods=['POST'])
 @login_required
@@ -56,6 +64,8 @@ def update_rule_settings(id):
         rule.enabled = False
     clusters = request.form.getlist('clusters[]')
     rule.set_clusters_by_id(clusters)
+    tags = request.form.getlist('tags[]')
+    rule.set_tags_by_name(tags,create_if_not=True)
     db.session.commit()
     flash("Updated settings")
     return redirect(url_for("main.view_rule",id=rule.id))

@@ -43,6 +43,11 @@
                 <thead class="bg-white-lt">
                   <tr>
                     <th class="text-white">Label</th>
+                    <th class="text-white">Description</th>
+                    <th class="text-white w-1">Tags</th>
+                    <th class="text-white w-1">Clusters</th>
+                    <th class="text-white w-1">Severity</th>
+                    <th class="text-white w-1">Enabled</th>
                     <th class="w-1 text-white">Edit</th>
                   </tr>
                 </thead>
@@ -50,6 +55,11 @@
                   {% for rule in rules %}
                   <tr>
                     <td class="subheader text-white">{{rule.label}}</td>
+                    <td class="subheader text-white">{{rule.description}}</td>
+                    <td class="subheader text-white">{%if rule.tags.count()%}<span class="badge bg-white-lt text-dark badge-sm ml-2">{{rule.tags.count()}}</span>{%else%}<span class="badge bg-secondary text-white badge-sm ml-2">0</span>{%endif%}</td>
+                    <td class="subheader text-white">{%if rule.clusters.count()%}<span class="badge bg-white-lt text-dark badge-sm ml-2">{{rule.clusters.count()}}</span>{%else%}<span class="badge bg-secondary text-white badge-sm ml-2">0</span>{%endif%}</td>
+                    <td class="subheader text-white">{%if rule.severity == "low"%}<span class="badge bg-green-lt badge-sm ml-2">Low</span>{%elif rule.severity == "moderate"%}<span class="badge bg-orange-lt badge-sm ml-2">Moderate</span>{%else%}<span class="badge bg-red-lt badge-sm ml-2">High</span>{%endif%}</td>
+                    <td class="subheader text-white">{%if rule.enabled%}<span class="badge bg-green-lt badge-sm ml-2">Enabled</span>{%else%}<span class="badge bg-orange-lt badge-sm ml-2">Disabled</span>{%endif%}</td>
                     <td class="text-center"><a href="{{url_for("main.view_rule",id=rule.id)}}"><i class="ti ti-edit text-yellow"></i></a></td>
                   </tr>
                   {%endfor%}

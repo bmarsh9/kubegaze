@@ -44,7 +44,6 @@ ul.chosen-choices {
             <h3 class="card-title">Edit Settings{%if rule.enabled%}<span class="badge bg-green-lt badge-sm ml-2">Enabled</span>{%else%}<span class="badge bg-red-lt badge-sm ml-2">Disabled</span>{%endif%}</h3>
           </div>
           <div class="card-body">
-<!--haaaaaaa-->
            <form method="post" action="{{url_for("main.update_rule_settings",id=rule.id)}}">
             <div class="form-group mb-2">
               <label class="form-label">Label</label>
@@ -103,6 +102,23 @@ ul.chosen-choices {
                 <small class="form-hint mt-2">Select which clusters you want your rule to apply to</small>
               </div>
             </div>
+            <div class="form-group mb-2 ">
+              <label class="form-label">Add Tags to Matched Event</label>
+              <div>
+                <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+                <select size="4" id="add-tags" autocomplete="off" multiple="multiple" name="tags[]" class="form-control subheader cursor-pointer" data-placeholder="Tags">
+                {%set rule_tags = rule.get_tags()%}
+                {% for tag in tags %}
+                  {%if tag in rule_tags %}
+                  <option value="{{tag.name}}" selected>{{tag.name|capitalize}}</option>
+                  {%else%}
+                  <option value="{{tag.name}}">{{tag.name|capitalize}}</option>
+                  {%endif%}
+                {% endfor %}
+                </select>
+                <small class="form-hint mt-2">If the event matches your rule, we will add the following tags to the alert. This is used for custom/advanced filtering.</small>
+              </div>
+            </div>
             <button type="submit" class="btn bg-cyan-lt mt-2">Save</div></button>
            </form>
           </div>
@@ -127,6 +143,7 @@ ul.chosen-choices {
 {% block extrajs %}
   <script>
     $('#cluster-select').chosen({width: '100%', skip_no_results: true,max_selected_options: 20});
+    $('#add-tags').chosen({width: '100%', create_option: true,skip_no_results: true,max_selected_options: 20});
   </script>
 
   <script>

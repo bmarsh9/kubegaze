@@ -15,10 +15,10 @@ import arrow
 import json
 import os
 
-
 class Alert(LogMixin,db.Model, UserMixin):
     __tablename__ = 'alerts'
     id = db.Column(db.Integer, primary_key=True)
+    evidence = db.Column(db.String())
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     rule_id = db.Column(db.Integer, db.ForeignKey('rules.id'), nullable=False)
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
@@ -36,14 +36,23 @@ class Rule(LogMixin,db.Model, UserMixin):
     remediation = db.Column(db.String())
     code = db.Column(db.JSON(),default="{}")
     clusters = db.relationship('Cluster', secondary='assoc_rules', lazy='dynamic')
+    tags = db.relationship('Tag', secondary='assoc_rule_tags', lazy='dynamic')
     alerts = db.relationship('Alert', backref='rule', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    def get_tags(self):
+        tags = []
+        for tag in self.tags.all():
+            tag = Tag.query.get(tag.id)
+            if tag:
+                tags.append(tag)
+        return tags
+
     def to_json(self):
         clusters = []
-        for tag in self.clusters.all():
-            clusters.append(cluster.uuid)
+        for cluster in self.clusters.all():
+            clusters.append(cluster.id)
         return {
             "id":self.id,
             "uuid":self.uuid,
@@ -72,16 +81,42 @@ class Rule(LogMixin,db.Model, UserMixin):
         db.session.commit()
         return True
 
+    def remove_from_all_tags(self):
+        AssocRuleTag.query.filter(AssocRuleTag.rule_id == self.id).delete()
+        db.session.commit()
+        return True
+
+    def set_tags_by_name(self,tags,create_if_not=False):
+#haaaaaa
+        self.remove_from_all_tags()
+        if not isinstance(tags,list):
+            tags = [tags]
+        for name in tags:
+            found = Tag.find_by_name(name)
+            if found:
+                assoc = AssocRuleTag(rule_id=self.id,tag_id=found.id)
+                db.session.add(assoc)
+            else:
+                if create_if_not:
+                    new_tag = Tag(name=name)
+                    db.session.add(new_tag)
+                    db.session.commit()
+                    assoc = AssocRuleTag(rule_id=self.id,tag_id=new_tag.id)
+                    db.session.add(assoc)
+        db.session.commit()
+        return True
+
     @staticmethod
     def add(uuid=None,label=None,description=None,code={}):
         if not uuid:
             uuid = str(generate_uuid())
         if not label:
             label = str(uuid)
-        if not code:
-            code = default_rule_code(name=uuid)
         rule = Rule(uuid=str(uuid),label=label,description=description,code=code)
         db.session.add(rule)
+        db.session.flush()
+        if not code:
+            rule.code = default_rule_code(rule.id,name=uuid)
         db.session.commit()
         return rule
 
@@ -96,6 +131,7 @@ class Event(LogMixin,db.Model, UserMixin):
     operation = db.Column(db.String(),default="unknown")
     data = db.Column(db.JSON(),default={})
     tags = db.relationship('Tag', secondary='assoc_tags', lazy='dynamic')
+    seen = db.Column(db.Boolean, default=False) # ran against rules
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     alerts = db.relationship('Alert', backref='event', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
@@ -454,6 +490,12 @@ class AssocRule(LogMixin,db.Model):
     rule_id = db.Column(db.Integer(), db.ForeignKey('rules.id', ondelete='CASCADE'))
     cluster_id = db.Column(db.Integer(), db.ForeignKey('clusters.id', ondelete='CASCADE'))
 
+class AssocRuleTag(LogMixin,db.Model):
+    __tablename__ = 'assoc_rule_tags'
+    id = db.Column(db.Integer(), primary_key=True)
+    tag_id = db.Column(db.Integer(), db.ForeignKey('tags.id', ondelete='CASCADE'))
+    rule_id = db.Column(db.Integer(), db.ForeignKey('rules.id', ondelete='CASCADE'))
+
 class AssocTag(LogMixin,db.Model):
     __tablename__ = 'assoc_tags'
     id = db.Column(db.Integer(), primary_key=True)
@@ -464,11 +506,19 @@ class Tag(LogMixin,db.Model):
     __tablename__ = 'tags'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), unique=True)
+    color = db.Column(db.String(), default="blue")
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    @staticmethod
+    def find_by_name(name):
+        tag_exists = Tag.query.filter(func.lower(Tag.name) == func.lower(name)).first()
+        if tag_exists:
+            return tag_exists
+        return False
 
 class ConfigStore(db.Model,LogMixin):
     __tablename__ = 'config_store'

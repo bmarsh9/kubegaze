@@ -1,0 +1,65 @@
+{% extends "layouts/condensed.html" %}
+
+{%block contentHeader_pretitle%}tags{%endblock%}
+{%block contentHeader_title%}Tags{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tags</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-bordered" id="example" style="width:100%">
+                <thead class="bg-white-lt">
+                  <tr>
+                    <th class="text-white">Name</th>
+                    <th class="text-white">Color</th>
+                    <th class="w-1 text-white">Save</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for tag in tags %}
+                  <tr>
+                    <td class="subheader text-white">{{tag.name}}</td>
+                    <td class="subheader">
+                      <select id="{{tag.id}}" class="form-select">
+                        <option value="red" {%if tag.color == "red"%}selected{%endif%}>Red</option>
+                        <option value="blue" {%if tag.color == "blue"%}selected{%endif%}>Blue</option>
+                        <option value="orange" {%if tag.color == "orange"%}selected{%endif%}>Orange</option>
+                      </select>
+                    </td>
+                    <td class="text-center"><button value="{{tag.id}}" class="save btn bg-transparent cursor-pointer"><i class="ti ti-settings text-yellow"></i></button></td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+              </table>
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {      
+      $(".save").click(function(){
+          var id = $(this).attr("value");
+          var color = $("#"+id).val();
+          $.ajax({
+            url: "/api/v1/tags/"+id+"/color/"+color,
+            method:"PUT",
+            success: function(data) {
+              notify_js("Saved edits", type = "success",time=1000)
+            },
+            error: function (request, status, error) {
+              console.log("error")
+              notify_js("Failed to save", type = "danger",time=1000)
+            }
+          });
+      }); 
+    });
+  </script>
+{%endblock%}
