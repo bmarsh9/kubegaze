@@ -1,6 +1,7 @@
 *.py[cod]
 env/*
 migrations
+poller/rules/*
 *pyc
 # C extensions
 *.so

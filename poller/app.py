@@ -20,6 +20,7 @@ class Poller():
                         result = getattr(schtasks,task["module"])(app, logging)
                     except Exception as e:
                         logging.error("Exception when processing task:{}. Error:{}".format(task["module"],e))
+                    logging.info("Completed task: {}".format(task["name"]))
                 else:
                     logging.debug("Skipping disabled task:{}".format(task["name"]))
             logging.debug("Completed loop. Sleeping for {} seconds".format(app.SLEEP_TIME))

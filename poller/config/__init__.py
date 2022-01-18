@@ -5,7 +5,7 @@ class Config():
         # --------------------------------- Poller Settings
         self.APP_NAME = os.environ.get("APP_NAME","Poller")
         self.VERSION = os.environ.get("VERSION","1.0.0")
-        self.LOG_LEVEL = os.environ.get("LOG_LEVEL","INFO")
+        self.LOG_LEVEL = os.environ.get("LOG_LEVEL","INFO").upper()
         self.SLEEP_TIME = os.environ.get("SLEEP_TIME",120)
 
         self.UI_HOST = os.environ.get("UI_HOST")
