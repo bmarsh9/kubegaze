@@ -92,7 +92,7 @@ def update_color_for_tag(id,color):
 #@poller_auth
 def get_rules():
     data = []
-    for rule in Rule.query.all():
+    for rule in Rule.query.filter(Rule.hide == False).filter(Rule.enabled == True).all():
         data.append(rule.to_json())
     return jsonify(data)
 

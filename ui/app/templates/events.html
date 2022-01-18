@@ -253,7 +253,7 @@ input[type=number] {
                 console.log("loading more events: "+event.responseJSON.last)
                 setTimeout(function() {
                   worker(event.responseJSON.last);
-                }, 5000)
+                }, 10000)
               }
               return
             },

@@ -33,7 +33,7 @@ def tags():
 @main.route('/rules', methods=['GET'])
 @login_required
 def rules():
-    rules = Rule.query.all()
+    rules = Rule.query.filter(Rule.hide == False).all()
     return render_template("rules.html",rules=rules)
 
 @main.route('/rules/<int:id>', methods=['GET'])
@@ -69,16 +69,17 @@ def update_rule_settings(id):
 @login_required
 def delete_rule(id):
     rule = Rule.query.get(id)
-    db.session.delete(rule)
+    rule.hide = True
+    rule.enabled = False
     db.session.commit()
-    flash("Deleted rule")
+    flash("Hid rule")
     return redirect(url_for("main.rules"))
 
 @main.route('/rules/add', methods=['GET','POST'])
 @login_required
 def add_rule():
-    new_rule = Rule.add()
-    flash("Added Rule")
+    new_rule = Rule.add(enabled=False)
+    flash("Added Rule. Please edit and enable the rule.")
     return redirect(url_for("main.view_rule",id=new_rule.id))
 
 @main.route('/events', methods=['GET'])

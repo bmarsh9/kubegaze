@@ -32,6 +32,7 @@ class Rule(LogMixin,db.Model, UserMixin):
     uuid = db.Column(db.String(),nullable=False,unique=True)
     description = db.Column(db.String())
     enabled = db.Column(db.Boolean, default=True)
+    hide = db.Column(db.Boolean, default=False)
     severity = db.Column(db.String())
     remediation = db.Column(db.String())
     code = db.Column(db.JSON(),default="{}")
@@ -106,12 +107,12 @@ class Rule(LogMixin,db.Model, UserMixin):
         return True
 
     @staticmethod
-    def add(uuid=None,label=None,description=None,code={}):
+    def add(uuid=None,label=None,description=None,enabled=True,code={}):
         if not uuid:
             uuid = str(generate_uuid())
         if not label:
             label = str(uuid)
-        rule = Rule(uuid=str(uuid),label=label,description=description,code=code)
+        rule = Rule(uuid=str(uuid),label=label,description=description,enabled=enabled,code=code)
         db.session.add(rule)
         db.session.flush()
         if not code:
