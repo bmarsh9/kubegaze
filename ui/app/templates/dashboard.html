@@ -38,7 +38,7 @@
           <div class="card-header">
             <h3 class="card-title">Alerts by Severity (historical)</h3>
           </div>
-          <div class="card-body">
+          <div id="chart1" class="card-body text-center">
             <div id="chartbar" class="chart-lg"></div>
           </div>
         </div>
@@ -48,7 +48,7 @@
           <div class="card-header">
             <h3 class="card-title">Cluster Events (last 24 hours)</h3>
           </div>
-          <div class="card-body">
+          <div id="chart2" class="card-body text-center">
             <div id="chartpie" class="chart-lg"></div>
           </div>
         </div>
@@ -82,18 +82,20 @@
 {%block extrajs%}
 <script>
 $(document).ready(function() {
+      $("#chart1").html('<div style="width:3rem;height:3rem" class="spinner-grow text-center" role="status"></div>')
       //bar chart
       $.ajax({
         url: "{{url_for("api.graph_get_alerts_by_severity")}}",
         type: "GET",
         contentType: "application/json; charset=utf-8",
         success: function (response) {
+      $("#chart1").html('<div id="chartbar" class="chart-lg"></div>')
 
         var options = {
           series:response["series"],
           chart: {
           type: 'bar',
-          height: 260,
+          height: 270,
           stacked: true,
           toolbar: {
             show: true
@@ -141,11 +143,13 @@ $(document).ready(function() {
         }
       });
       // donut chart
+      $("#chart2").html('<div style="width:3rem;height:3rem" class="spinner-grow text-center" role="status"></div>')
       $.ajax({
         url: "{{url_for("api.graph_get_cluster_event_count")}}",
         type: "GET",
         contentType: "application/json; charset=utf-8",
         success: function (response) {
+      $("#chart2").html('<div id="chartpie" class="chart-lg"></div>')
 
         var options = {
           series: response["series"],
