@@ -108,6 +108,14 @@ def events():
     return render_template("events.html",filters=filters,cluster_list=cluster_list,
         operation_list=operation_list,tags=tags,query_string=query_string)
 
+@main.route('/events/<int:id>/alerts', methods=['GET'])
+@login_required
+def view_alerts_for_event(id):
+    event = Event.query.get(id)
+    json_data = json.dumps(event.data,indent=4)
+    return render_template("view_alerts_for_event.html",event=event,
+        json_data=json_data)
+
 @main.route('/clusters/token', methods=['GET'])
 @login_required
 def generate_token_for_cluster():

@@ -120,6 +120,35 @@ class Rule(LogMixin,db.Model, UserMixin):
         db.session.commit()
         return rule
 
+    def get_table_for_rule_details(self):
+        template = ""
+        shell_template = """
+                                  <div class="table-responsive rounded-2">
+                                    <table class="table table-vcenter">
+                                      <thead class="bg-secondary">
+                                        <tr>
+                                          <th class="w-1 text-white">Key</th>
+                                          <th class="text-white">Value</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                      {}
+                                      </tbody>
+                                    </table>
+                                  </div>
+        """
+        row_template = """
+          <tr>
+            <td class="bg-secondary text-white subheader">{}</td>
+            <td class="text-white subheader">{}</td>
+          </tr>"""
+        template+=row_template.format("id",self.id)
+        template+=row_template.format("label",self.label)
+        template+=row_template.format("severity",self.severity)
+        template+=row_template.format("description",self.description)
+        template+=row_template.format("remediation",self.remediation)
+        return shell_template.format(template)
+
 class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
@@ -216,7 +245,7 @@ class Event(LogMixin,db.Model, UserMixin):
         alert_link_html = ""
         alerts = self.alerts.count()
         if alerts:
-            alert_link_html = '<a href="/"><i class="ti ti-external-link text-cyan cursor-pointer"></i></a>'
+            alert_link_html = '<a href="/events/{}/alerts"><i class="ti ti-external-link text-cyan cursor-pointer"></i></a>'.format(self.id)
         template+=row_template.format("alerts",alerts,alert_link_html)
         return template
 

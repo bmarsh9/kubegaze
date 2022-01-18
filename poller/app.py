@@ -24,7 +24,7 @@ class Poller():
                 else:
                     logging.debug("Skipping disabled task:{}".format(task["name"]))
             logging.debug("Completed loop. Sleeping for {} seconds".format(app.SLEEP_TIME))
-            time.sleep(app.SLEEP_TIME)
+            time.sleep(int(app.SLEEP_TIME))
 
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.dirname(__file__))

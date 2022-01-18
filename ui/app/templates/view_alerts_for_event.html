@@ -1,0 +1,64 @@
+{% extends "layouts/condensed.html" %}
+
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True) }}
+{% endblock %}
+
+{%block contentHeader_pretitle%}alerts{%endblock%}
+{%block contentHeader_title%}Alerts for Event: {{event.uid}}{%endblock%}
+
+{%block fluidHeader%}<div class="container-fluid">{%endblock%}
+{%block fluidBody%}<div class="container-fluid">{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Event Spec</h3>
+            <div class="card-actions"><span class="badge bg-yellow-lt ml-2">{{event.alerts.count()}} alerts</span></div>
+          </div>
+          <div class="card-body">
+          <pre>
+          {{json_data}}
+          </pre>
+          </div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="alert alert-warning text-white bg-transparent" role="alert">
+          <small>This event has {{event.alerts.count()}} alerts. For each alert, please read the remediation to understand how to fix the violation. The event spec is found on the left panel.</small>
+        </div>
+    {%for alert in event.alerts.all()%}
+    <div class="col-6">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">{{alert.rule.label}}<span class="badge bg-{%if alert.rule.severity == "low"%}green{%elif alert.rule.severity == "moderate"%}yellow{%else%}red{%endif%}-lt ml-2">{{alert.rule.severity}}</span></h3>
+            <div class="card-actions"><a class="text-white btn bg-transparent" href="{{url_for("main.view_rule",id=alert.rule.id)}}"><i class="ti ti-external-link"></i></a></div>
+          </div>
+          <div class="card-body">
+            <h4>Rule Details</h4>
+            {{alert.rule.get_table_for_rule_details()|safe}}
+            <div class="mt-2">
+            <h4>Evidence</h4>
+            <pre style="white-space:normal">
+            {{alert.evidence}}
+            </pre>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+    {%endfor%}
+  </div>
+{%endblock%}
+
+{%block extrajs%}
+<script>
+  $(document).ready(function() {
+    $('#example').DataTable({"pageLength":25,"order": [[ 0, "desc" ]]});
+  } );
+</script>
+{% endblock %}
