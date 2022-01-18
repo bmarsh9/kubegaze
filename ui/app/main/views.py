@@ -95,14 +95,16 @@ def events():
     date_sort = request.args.get('date_sort', "gt", type=str)
     operations = request.args.getlist('operations')
     tags = request.args.getlist('tags')
-    filters = {"name":name,"namespace":namespace,"tags":tags,
+    clusters = request.args.getlist('clusters')
+    filters = {"name":name,"namespace":namespace,"tags":tags,"clusters":clusters,
         "operations":operations,"date_added":date_added,"date_sort":date_sort,
         "limit":limit,"update":update,"uid":uid
     }
+    cluster_list = Cluster.query.all()
     operation_list = Event.get_operations_in_list()
     tags = Tag.query.filter(Tag.name != None).all()
     query_string = request.query_string.decode("utf-8")
-    return render_template("events.html",filters=filters,
+    return render_template("events.html",filters=filters,cluster_list=cluster_list,
         operation_list=operation_list,tags=tags,query_string=query_string)
 
 @main.route('/clusters/token', methods=['GET'])

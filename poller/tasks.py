@@ -60,5 +60,5 @@ def execute_rules(app, logging):
         logging.warning("Unable to POST results to {}. Status code: {}. Warning:{}".format(results_url,
             results.status_code,results.text))
         return False
-    print(results.json())
+    logging.debug("Response from results endpoint:{}".format(str(results.json())))
     return True

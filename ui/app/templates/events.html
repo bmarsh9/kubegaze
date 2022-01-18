@@ -40,6 +40,11 @@ input[type=number] {
     <div class="col-auto ms-auto d-print-none">
       <div class="btn-list">
         <span class="d-none d-sm-inline">
+          <a href="#" onClick="window.location.reload();" class="btn bg-orange-lt">
+            Refresh
+          </a>
+        </span>
+        <span class="d-none d-sm-inline">
           <a href="#" class="btn bg-cyan-lt">
             Dashboard
           </a>
@@ -88,6 +93,19 @@ input[type=number] {
     <div class="col-auto mb-2">
       <div class="subheader mb-2">Filter by UID (wildcard)</div>
       <input type="text" class="form-control subheader cursor-pointer {% if filters["uid"]%}is-valid{%endif%}" id="uid" name="uid" value="{% if filters["uid"]%}{{filters["uid"]}}{%endif%}" autocomplete="off" placeholder="uid">
+    </div>
+    <div class="col-auto mb-2">
+      <div class="subheader mb-2">Clusters (or)</div>
+      <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+      <select size="4" autocomplete="off" multiple="multiple" name="clusters[]" class="form-control subheader cursor-pointer {% if filters["clusters"]%}is-valid{%endif%}" id="filter-clusters" data-placeholder="clusters">
+      {% for cluster in cluster_list %}
+        {%if cluster.id|string in filters["clusters"] %}
+        <option value="{{cluster.id}}" selected>{{cluster.label|capitalize}}</option>
+        {%else%}
+        <option value="{{cluster.id}}">{{cluster.label|capitalize}}</option>
+        {%endif%}
+      {% endfor %}
+      </select>
     </div>
     <div class="col-auto mb-2">
       <div class="subheader mb-2">Operations (or)</div>
@@ -161,6 +179,7 @@ input[type=number] {
     var date_sort = $("#date_sort").val()
     var tags = $("#filter-tags").val()
     var operations = $("#filter-operations").val()
+    var clusters = $("#filter-clusters").val()
 
     if (name) {
         dict.name = name;
@@ -185,6 +204,9 @@ input[type=number] {
     if (tags) {
         dict.tags = tags;
     };
+    if (clusters) {
+        dict.clusters = clusters;
+    };
     if (operations) {
         dict.operations = operations;
     };
@@ -204,7 +226,8 @@ input[type=number] {
 </script>
 <script>
   $('#filter-operations').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
-  $('#filter-tags').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
+  $('#filter-tags').chosen({width: '100%', skip_no_results: true,max_selected_options: 10});
+  $('#filter-clusters').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
 </script>
   <script>
     $(document).ready(function() {

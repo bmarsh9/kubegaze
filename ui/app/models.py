@@ -203,6 +203,7 @@ class Event(LogMixin,db.Model, UserMixin):
             <td>{}</td>
           </tr>"""
         template+=row_template.format("id",self.id,"")
+        template+=row_template.format("cluster",self.cluster.label,"")
         template+=row_template.format("Seen by Rules",self.seen,"")
         template+=row_template.format("uid",self.uid,"")
         template+=row_template.format("time",self.date_added,"")
@@ -211,6 +212,11 @@ class Event(LogMixin,db.Model, UserMixin):
         template+=row_template.format("name",self.name,"")
         template+=row_template.format("namespace",self.namespace,"")
         template+=row_template.format("operation",self.operation,"")
+        alert_link_html = ""
+        alerts = self.alerts.count()
+        if alerts:
+            alert_link_html = '<a href="/"><i class="ti ti-external-link text-cyan cursor-pointer"></i></a>'
+        template+=row_template.format("alerts",alerts,alert_link_html)
         return template
 
     def to_list(self):
@@ -226,11 +232,14 @@ class Event(LogMixin,db.Model, UserMixin):
         seen = ""
         if self.seen:
             seen = "border-start border-info"
+        ribbon = ""
+        if self.alerts.count():
+            ribbon = '<div class="ribbon ribbon-top bg-red"><i style="font-size:1rem" class="ti ti-alert-triangle"></i></div>'
         template = """
               <div class="accordion-item mb-2 bg-dark rounded-2">
                 <h2 class="accordion-header {}" id="heading_{}">
                   <button class="accordion-button collapsed text-secondary bg-dark d-block" type="button" data-bs-toggle="collapse" data-bs-target="#event_{}" aria-expanded="false" aria-controls="event_{}">
-                    <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere text-cyan"></i><br><small class="subheader">{}</small></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3" style="color:#a4a3a3;">{} / {}</div><div class="ms-auto subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
+                    {}<div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere text-cyan"></i><br><small class="subheader">{}</small></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3" style="color:#a4a3a3;">{} / {}</div><div class="ms-auto subheader mt-3">{}</div></div><div class="col-12">{}</div></div></div></div>
                   </button>
                 </h2>
                 <div id="event_{}" class="accordion-collapse collapse" aria-labelledby="heading_{}" data-bs-parent="#event_{}">
@@ -278,7 +287,7 @@ class Event(LogMixin,db.Model, UserMixin):
                     </div>
                   </div>
                 </div>
-              </div>""".format(seen,self.id,self.id,self.id,self.id,self.kind,self.name,
+              </div>""".format(seen,self.id,self.id,self.id,ribbon,self.id,self.kind,self.name,
                   self.date_added,labels_html,self.id,self.id,self.id,json.dumps(self.data,indent=4),
                   self.get_table_for_event_details())
 
@@ -294,7 +303,7 @@ class Event(LogMixin,db.Model, UserMixin):
         return operations
 
     @staticmethod
-    def get_events_from_api_query(date_added=None,operations=[],tags=[],
+    def get_events_from_api_query(date_added=None,operations=[],tags=[],clusters=[],
         name=None,namespace=None,uid=None,date_sort="gt",last=0,limit=50):
         data = {"last":0,"events":[]}
         _query = Event.query
@@ -307,6 +316,8 @@ class Event(LogMixin,db.Model, UserMixin):
         if uid:
             search = "%{}%".format(uid)
             _query = _query.filter(Event.uid.ilike(search))
+        if clusters:
+            _query = _query.filter(Event.cluster_id.in_(clusters))
         if operations:
             _query = _query.filter(func.lower(Event.operation).in_(operations))
         if tags:
