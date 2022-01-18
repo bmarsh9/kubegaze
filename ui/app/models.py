@@ -87,7 +87,6 @@ class Rule(LogMixin,db.Model, UserMixin):
         return True
 
     def set_tags_by_name(self,tags,create_if_not=False):
-#haaaaaa
         self.remove_from_all_tags()
         if not isinstance(tags,list):
             tags = [tags]
@@ -167,6 +166,30 @@ class Event(LogMixin,db.Model, UserMixin):
                 return False
         return True
 
+    def remove_from_all_tags(self):
+        AssocTag.query.filter(AssocTag.event_id == self.id).delete()
+        db.session.commit()
+        return True
+
+    def set_tags_by_name(self,tags,create_if_not=False):
+        self.remove_from_all_tags()
+        if not isinstance(tags,list):
+            tags = [tags]
+        for name in tags:
+            found = Tag.find_by_name(name)
+            if found:
+                assoc = AssocTag(event_id=self.id,tag_id=found.id)
+                db.session.add(assoc)
+            else:
+                if create_if_not:
+                    new_tag = Tag(name=name)
+                    db.session.add(new_tag)
+                    db.session.commit()
+                    assoc = AssocTag(event_id=self.id,tag_id=new_tag.id)
+                    db.session.add(assoc)
+        db.session.commit()
+        return True
+
     def get_table_for_event_details(self):
         template = ""
         row_template = """
@@ -188,11 +211,13 @@ class Event(LogMixin,db.Model, UserMixin):
     def to_list(self):
         labels_html = """
         """
-        for field in ["operation","kind","name","namespace"]:
+        for field in ["operation","name"]:
             color = "cyan"
             if field == "operation":
                 color = "orange"
             labels_html += '<span class="badge bg-{}-lt mr-2">{}:{}</span>'.format(color,field,getattr(self,field))
+        for tag in self.tags.all():
+            labels_html += '<span class="badge bg-{}-lt mr-2">{}</span>'.format(tag.color,tag.name)
         template = """
               <div class="accordion-item mb-2 bg-dark rounded-2">
                 <h2 class="accordion-header" id="heading_{}">
