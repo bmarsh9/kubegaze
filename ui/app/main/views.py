@@ -41,6 +41,22 @@ def view_rule(id):
     rule = Rule.query.get(id)
     return render_template("view_rule.html",rule=rule)
 
+@main.route('/rules/<int:id>/settings', methods=['POST'])
+@login_required
+def update_rule_settings(id):
+    rule = Rule.query.get(id)
+    rule.label = request.form.get("label")
+    rule.description = request.form.get("description")
+    rule.remediation = request.form.get("remediation")
+    rule.severity = request.form.get("severity")
+    if request.form.get("enabled") == "on":
+        rule.enabled = True
+    else:
+        rule.enabled = False
+    db.session.commit()
+    flash("Updated settings")
+    return redirect(url_for("main.view_rule",id=rule.id))
+
 @main.route('/rules/<int:id>/delete', methods=['GET'])
 @login_required
 def delete_rule(id):
@@ -80,11 +96,6 @@ def events():
     query_string = request.query_string.decode("utf-8")
     return render_template("events.html",filters=filters,
         operation_list=operation_list,tags=tags,query_string=query_string)
-
-@main.route('/test', methods=['GET'])
-@login_required
-def test():
-    return render_template("test.html")
 
 @main.route('/clusters/<int:id>/token', methods=['GET'])
 @login_required
