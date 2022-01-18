@@ -2,8 +2,30 @@
 {% block head %}
 <script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" ></script>
 {%endblock%}
-{%block contentHeader_pretitle%}<a href="{{url_for("main.rules")}}">rules</a>{%endblock%}
-{%block contentHeader_title%}Rule Editor{%endblock%}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        <a href="{{url_for("main.rules")}}">rules</a>
+      </div>
+      <h2 class="page-title">
+        Rule Editor
+      </h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.delete_rule",id=rule.id)}}" class="btn bg-orange-lt">
+            Delete Rule
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}
 
 {%block content%}
   <div class="row row-cards">

@@ -41,6 +41,15 @@ def view_rule(id):
     rule = Rule.query.get(id)
     return render_template("view_rule.html",rule=rule)
 
+@main.route('/rules/<int:id>/delete', methods=['GET'])
+@login_required
+def delete_rule(id):
+    rule = Rule.query.get(id)
+    db.session.delete(rule)
+    db.session.commit()
+    flash("Deleted rule")
+    return redirect(url_for("main.rules"))
+
 @main.route('/rules/add', methods=['GET','POST'])
 @login_required
 def add_rule():

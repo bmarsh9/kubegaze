@@ -15,6 +15,15 @@ import arrow
 import json
 import os
 
+
+class Alert(LogMixin,db.Model, UserMixin):
+    __tablename__ = 'alerts'
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    rule_id = db.Column(db.Integer, db.ForeignKey('rules.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
 class Rule(LogMixin,db.Model, UserMixin):
     __tablename__ = 'rules'
     id = db.Column(db.Integer, primary_key=True)
@@ -22,8 +31,12 @@ class Rule(LogMixin,db.Model, UserMixin):
     uuid = db.Column(db.String(),nullable=False,unique=True)
     description = db.Column(db.String())
     enabled = db.Column(db.Boolean, default=True)
+    severity = db.Column(db.Integer())
+    remediation = db.Column(db.String())
+    category = db.Column(db.String())
     code = db.Column(db.JSON(),default="{}")
     clusters = db.relationship('Cluster', secondary='assoc_rules', lazy='dynamic')
+    alerts = db.relationship('Alert', backref='rule', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -67,6 +80,7 @@ class Event(LogMixin,db.Model, UserMixin):
     data = db.Column(db.JSON(),default={})
     tags = db.relationship('Tag', secondary='assoc_tags', lazy='dynamic')
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
+    alerts = db.relationship('Alert', backref='event', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 

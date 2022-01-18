@@ -51,7 +51,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(next_page or url_for('main.home'))
     form = LoginForm()
-    if form.validate_on_submit():
+    if request.method == "POST":
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
             flash(_l('Invalid email or password'), 'info')
