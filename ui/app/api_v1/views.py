@@ -38,9 +38,9 @@ def post_events_from_cluster(id):
     db.session.commit()
     return jsonify({"message":"ok"})
 
-@api.route('/events', methods=['GET'])
+@api.route('/feed', methods=['GET'])
 @login_required
-def get_events():
+def get_event_feed():
     #haaaa
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
@@ -69,3 +69,24 @@ def save_code_for_rule(id):
     rule.code = data["code"]
     db.session.commit()
     return jsonify({"code":rule.code})
+
+@api.route('/rules', methods=['GET'])
+def get_rules():
+    data = []
+    for rule in Rule.query.all():
+        data.append(rule.to_json())
+    return jsonify(data)
+
+@api.route('/events', methods=['GET'])
+def get_events():
+    data = []
+    for event in Event.query.order_by(Event.id.desc()).limit(1).all():
+        data.append(event.to_json())
+    return jsonify(data)
+
+@api.route('/hits', methods=['POST'])
+def post_hits():
+    data = []
+    for rule in Rule.query.all():
+        data.append(rule.to_json())
+    return jsonify(data)

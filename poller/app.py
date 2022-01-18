@@ -34,9 +34,5 @@ if __name__ == "__main__":
             datefmt='%Y-%m-%d %H:%M:%S'
     )
     logging.info("Starting the poller. Version {}".format(app.VERSION))
-
-    if not app.Workflow:
-        logging.critical("Database is not ready. Exiting...")
-    else:
-        # Start service
-        Poller(app).run()
+    # Start service
+    Poller(app).run()

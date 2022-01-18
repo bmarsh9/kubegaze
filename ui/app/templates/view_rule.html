@@ -54,8 +54,8 @@ function readOnlyLines(editor) {
   editor.commands.on("exec", function(e) {
     var rowCol = editor.selection.getCursor();
     var last_3 = editor.session.getLength() - 5
-    if (rowCol.row < 3 || rowCol.row > last_3) {
-      editor.gotoLine(3);
+    if (rowCol.row < 4 || rowCol.row > last_3) {
+      editor.gotoLine(4);
       editor.navigateLineEnd()
       if (e.args === "\n") {
         console.log("new line")

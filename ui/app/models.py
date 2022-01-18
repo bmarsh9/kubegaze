@@ -27,6 +27,21 @@ class Rule(LogMixin,db.Model, UserMixin):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    def to_json(self):
+        clusters = []
+        for tag in self.clusters.all():
+            clusters.append(cluster.uuid)
+        return {
+            "id":self.id,
+            "uuid":self.uuid,
+            "label":self.label,
+            "description":self.description,
+            "enabled":self.enabled,
+            "code":self.code,
+            "clusters":clusters,
+            "date_added":self.date_added
+        }
+
     @staticmethod
     def add(uuid=None,label=None,description=None,code={}):
         if not uuid:

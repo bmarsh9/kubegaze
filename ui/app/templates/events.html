@@ -203,7 +203,7 @@ input[type=number] {
         (function worker(last=0) {
           $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow" role="status"></div>');
           $.ajax({
-            url: "/api/v1/events?"+"{{query_string|safe}}"+"&last="+last,
+            url: "/api/v1/feed?"+"{{query_string|safe}}"+"&last="+last,
             success: function(data) {
               var eventCount = data["events"].length;
               console.log("adding "+eventCount+" events")
