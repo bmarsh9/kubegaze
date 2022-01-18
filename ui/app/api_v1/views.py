@@ -10,12 +10,6 @@ from datetime import datetime, timedelta
 def get_health():
     return jsonify({"message":"ok"})
 
-@api.route('/clusters/token', methods=['GET'])
-@login_required
-def get_token_for_cluster():
-    token = Cluster.generate_auth_token()
-    return jsonify({"token":token})
-
 @api.route('/clusters/token/check', methods=['GET'])
 def check_token_for_cluster():
     token = request.args.get("token")
@@ -25,6 +19,12 @@ def check_token_for_cluster():
     if not result:
         return jsonify({"message":"authentication failed"}),401
     return jsonify({"message":"ok"})
+
+@api.route('/clusters/token', methods=['GET'])
+@login_required
+def get_token_for_cluster():
+    token = Cluster.generate_auth_token()
+    return jsonify({"token":token})
 
 @api.route('/cluster/<int:id>/events', methods=['POST'])
 #@cluster_auth
@@ -48,7 +48,6 @@ def post_events_from_cluster(id):
 @api.route('/feed', methods=['GET'])
 @login_required
 def get_event_feed():
-    #haaaa
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
@@ -66,11 +65,13 @@ def get_event_feed():
     return jsonify(events)
 
 @api.route('/rules/<int:id>/code', methods=['GET'])
+@login_required
 def get_code_for_rule(id):
     rule = Rule.query.get(id)
     return jsonify({"code":rule.code})
 
 @api.route('/rules/<int:id>/code', methods=['PUT'])
+@login_required
 def save_code_for_rule(id):
     rule = Rule.query.get(id)
     data = request.get_json()
@@ -79,6 +80,7 @@ def save_code_for_rule(id):
     return jsonify({"code":rule.code})
 
 @api.route('/tags/<int:id>/color/<string:color>', methods=['PUT'])
+@login_required
 def update_color_for_tag(id,color):
     tag = Tag.query.get(id)
     tag.color = color
@@ -86,6 +88,7 @@ def update_color_for_tag(id,color):
     return jsonify({"message":"ok"})
 
 @api.route('/rules', methods=['GET'])
+#@poller_auth
 def get_rules():
     data = []
     for rule in Rule.query.all():
@@ -93,13 +96,15 @@ def get_rules():
     return jsonify(data)
 
 @api.route('/events', methods=['GET'])
+#@poller_auth
 def get_events():
     data = []
-    for event in Event.query.filter(Event.seen == False).order_by(Event.id.desc()).limit(10).all():
+    for event in Event.query.filter(Event.seen == False).order_by(Event.id.desc()).limit(100).all():
         data.append(event.to_json())
     return jsonify(data)
 
 @api.route('/hits', methods=['POST'])
+#@poller_auth
 def post_hits():
     data = request.get_json()
     for record in data:
@@ -107,7 +112,10 @@ def post_hits():
         if event:
             event.seen = True
             for alert in record["hits"]:
-                event.alerts.append(Alert(evidence=alert["evidence"],
-                    rule_id=alert["rule_id"],cluster_id=event.cluster_id))
+                rule = Rule.query.get(alert["rule_id"])
+                if rule:
+                    event.set_tags_by_name(rule.tags.all(),as_objects=True)
+                    event.alerts.append(Alert(evidence=alert["evidence"],
+                        rule_id=alert["rule_id"],cluster_id=event.cluster_id))
     db.session.commit()
     return jsonify({"message":"ok"})

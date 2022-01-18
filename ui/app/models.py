@@ -41,7 +41,7 @@ class Rule(LogMixin,db.Model, UserMixin):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    def get_tags(self):
+    def get_tags(self,to_list=False):
         tags = []
         for tag in self.tags.all():
             tag = Tag.query.get(tag.id)
@@ -171,23 +171,27 @@ class Event(LogMixin,db.Model, UserMixin):
         db.session.commit()
         return True
 
-    def set_tags_by_name(self,tags,create_if_not=False):
+    def set_tags_by_name(self,tags,as_objects=False,create_if_not=False):
         self.remove_from_all_tags()
-        if not isinstance(tags,list):
-            tags = [tags]
-        for name in tags:
-            found = Tag.find_by_name(name)
-            if found:
-                assoc = AssocTag(event_id=self.id,tag_id=found.id)
-                db.session.add(assoc)
-            else:
-                if create_if_not:
-                    new_tag = Tag(name=name)
-                    db.session.add(new_tag)
-                    db.session.commit()
-                    assoc = AssocTag(event_id=self.id,tag_id=new_tag.id)
+        if as_objects:
+            self.tags.extend(tags)
+            db.session.commit()
+        else:
+            if not isinstance(tags,list):
+                tags = [tags]
+            for name in tags:
+                found = Tag.find_by_name(name)
+                if found:
+                    assoc = AssocTag(event_id=self.id,tag_id=found.id)
                     db.session.add(assoc)
-        db.session.commit()
+                else:
+                    if create_if_not:
+                        new_tag = Tag(name=name)
+                        db.session.add(new_tag)
+                        db.session.commit()
+                        assoc = AssocTag(event_id=self.id,tag_id=new_tag.id)
+                        db.session.add(assoc)
+            db.session.commit()
         return True
 
     def get_table_for_event_details(self):
@@ -199,6 +203,7 @@ class Event(LogMixin,db.Model, UserMixin):
             <td>{}</td>
           </tr>"""
         template+=row_template.format("id",self.id,"")
+        template+=row_template.format("Seen by Rules",self.seen,"")
         template+=row_template.format("uid",self.uid,"")
         template+=row_template.format("time",self.date_added,"")
         template+=row_template.format("kind",self.kind,"")
@@ -218,9 +223,12 @@ class Event(LogMixin,db.Model, UserMixin):
             labels_html += '<span class="badge bg-{}-lt mr-2">{}:{}</span>'.format(color,field,getattr(self,field))
         for tag in self.tags.all():
             labels_html += '<span class="badge bg-{}-lt mr-2">{}</span>'.format(tag.color,tag.name)
+        seen = ""
+        if self.seen:
+            seen = "border-start border-info"
         template = """
               <div class="accordion-item mb-2 bg-dark rounded-2">
-                <h2 class="accordion-header" id="heading_{}">
+                <h2 class="accordion-header {}" id="heading_{}">
                   <button class="accordion-button collapsed text-secondary bg-dark d-block" type="button" data-bs-toggle="collapse" data-bs-target="#event_{}" aria-expanded="false" aria-controls="event_{}">
                     <div class="row"><div class="col-1 text-center mt-2"><i style="font-size:2rem" class="ti ti-3d-cube-sphere text-cyan"></i><br><small class="subheader">{}</small></div><div class="col-11"><div class="row"><div class="col-12 mb-2 d-flex align-items-center"><div class="h3" style="color:#a4a3a3;">{} / {}</div><div class="ms-auto subheader">{}</div></div><div class="col-12">{}</div></div></div></div>
                   </button>
@@ -270,7 +278,7 @@ class Event(LogMixin,db.Model, UserMixin):
                     </div>
                   </div>
                 </div>
-              </div>""".format(self.id,self.id,self.id,self.id,self.kind,self.name,
+              </div>""".format(seen,self.id,self.id,self.id,self.id,self.kind,self.name,
                   self.date_added,labels_html,self.id,self.id,self.id,json.dumps(self.data,indent=4),
                   self.get_table_for_event_details())
 
