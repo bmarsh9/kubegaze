@@ -5,7 +5,7 @@ import glob
 import json
 import timeout_decorator
 
-@timeout_decorator.timeout(10)
+@timeout_decorator.timeout(5)
 def execute_rule(rule,event):
     uuid = os.path.splitext(os.path.basename(rule))[0]
     module_name = "{}.{}".format("rules",uuid)
