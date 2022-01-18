@@ -45,14 +45,13 @@ def execute_rules(app, logging):
         return False
     logging.debug("Gathered {} events".format(len(events.json())))
     for event in events.json():
-#haaaaaaa
         logging.debug("Running event:{} against rules".format(event["uid"]))
-        # execute all rules against the event
         hits = helpers.execute_event_against_rules(event,logging)
         logging.debug("Event:{} has {} hits".format(event["uid"],len(hits)))
         data.append({"id":event["id"],"count":len(hits),"hits":hits})
     if not data:
         return True
+
     # post results
     logging.debug("Posting results to {}".format(results_url))
     results = requests.post(url=results_url,json=data,verify=verify)

@@ -12,7 +12,6 @@ def execute_rule(rule,event):
     module = importlib.import_module(module_name)
     return getattr(module,"uuid_{}".format(uuid))(event)
 
-#@timeout_decorator.timeout(BLOCK_TIMEOUT)
 def execute_event_against_rules(event,logging,**kwargs):
     hits = []
     for rule in glob.glob("rules/*.py"):

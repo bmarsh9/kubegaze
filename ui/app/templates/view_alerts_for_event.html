@@ -31,6 +31,7 @@
         <div class="alert alert-warning text-white bg-transparent" role="alert">
           <small>This event has {{event.alerts.count()}} alerts. For each alert, please read the remediation to understand how to fix the violation. The event spec is found on the left panel.</small>
         </div>
+    <div class="row">
     {%for alert in event.alerts.all()%}
     <div class="col-6">
         <div class="card">
@@ -50,8 +51,9 @@
           </div>
         </div>
     </div>
-    </div>
     {%endfor%}
+    </div>
+    </div>
   </div>
 {%endblock%}
 
