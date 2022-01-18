@@ -86,6 +86,10 @@ input[type=number] {
       <input type="text" class="form-control subheader cursor-pointer {% if filters["namespace"]%}is-valid{%endif%}" id="namespace" name="namespace" value="{% if filters["namespace"]%}{{filters["namespace"]}}{%endif%}" autocomplete="off" placeholder="namespace">
     </div>
     <div class="col-auto mb-2">
+      <div class="subheader mb-2">Filter by UID (wildcard)</div>
+      <input type="text" class="form-control subheader cursor-pointer {% if filters["uid"]%}is-valid{%endif%}" id="uid" name="uid" value="{% if filters["uid"]%}{{filters["uid"]}}{%endif%}" autocomplete="off" placeholder="uid">
+    </div>
+    <div class="col-auto mb-2">
       <div class="subheader mb-2">Operations (or)</div>
       <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
       <select size="4" autocomplete="off" multiple="multiple" name="operations[]" class="form-control subheader cursor-pointer {% if filters["operations"]%}is-valid{%endif%}" id="filter-operations" data-placeholder="operations">
@@ -150,6 +154,7 @@ input[type=number] {
     var dict = {};
     var name = $("#name").val()
     var namespace = $("#namespace").val()
+    var uid = $("#uid").val()
     var limit = $("#limit").val()
     var update = $("#update").is(":checked")
     var date_added = $("#datepicker-icon-prepend").val()
@@ -162,6 +167,9 @@ input[type=number] {
     };
     if (namespace) {
         dict.namespace = namespace;
+    };
+    if (uid) {
+        dict.uid = uid;
     };
     if (update) {
         dict.update = 1;

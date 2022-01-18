@@ -62,6 +62,7 @@ def add_rule():
 def events():
     name = request.args.get('name', None, type=str)
     namespace = request.args.get('namespace', None, type=str)
+    uid = request.args.get('uid', None, type=str)
     limit = request.args.get('limit', 50, type=int)
     update = request.args.get('update', 1, type=int)
     date_added = request.args.get('date_added', None, type=str)
@@ -72,7 +73,7 @@ def events():
     tags = request.args.getlist('tags')
     filters = {"name":name,"namespace":namespace,"tags":tags,
         "operations":operations,"date_added":date_added,"date_sort":date_sort,
-        "limit":limit,"update":update
+        "limit":limit,"update":update,"uid":uid
     }
     operation_list = Event.get_operations_in_list()
     tags = Tag.query.filter(Tag.name != None).all()

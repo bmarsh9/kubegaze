@@ -48,6 +48,7 @@ def get_event_feed():
     events = Event.get_events_from_api_query(
         name=request.args.get('name', None, type=str),
         namespace=request.args.get('namespace', None, type=str),
+        uid=request.args.get('uid', None, type=str),
         operations=request.args.getlist('operations'),
         tags=request.args.getlist('tags'),
         date_sort=request.args.get('date_sort', "gt", type=str),

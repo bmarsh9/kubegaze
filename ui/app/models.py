@@ -209,7 +209,7 @@ class Event(LogMixin,db.Model, UserMixin):
 
     @staticmethod
     def get_events_from_api_query(date_added=None,operations=[],tags=[],
-        name=None,namespace=None,date_sort="gt",last=0,limit=50):
+        name=None,namespace=None,uid=None,date_sort="gt",last=0,limit=50):
         data = {"last":0,"events":[]}
         _query = Event.query
         if name:
@@ -218,6 +218,9 @@ class Event(LogMixin,db.Model, UserMixin):
         if namespace:
             search = "%{}%".format(namespace)
             _query = _query.filter(Event.namespace.ilike(search))
+        if uid:
+            search = "%{}%".format(uid)
+            _query = _query.filter(Event.uid.ilike(search))
         if operations:
             _query = _query.filter(func.lower(Event.operation).in_(operations))
         if tags:
