@@ -80,7 +80,7 @@ def get_rules():
 @api.route('/events', methods=['GET'])
 def get_events():
     data = []
-    for event in Event.query.order_by(Event.id.desc()).limit(1).all():
+    for event in Event.query.order_by(Event.id.desc()).limit(10).all():
         data.append(event.to_json())
     return jsonify(data)
 
