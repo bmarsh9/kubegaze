@@ -1,7 +1,16 @@
 {% extends "layouts/condensed.html" %}
+
 {% block head %}
+{{ super() }}
+{% import "helpers/src_macros.html" as macro %}
+{{ macro.filehelper(old_select=True) }}
 <script src="https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js" type="text/javascript" ></script>
-{%endblock%}
+<style>
+ul.chosen-choices {
+  background-color:transparent !important;
+}
+</style>
+{% endblock %}
 
 {%block contentHeader%}
 <div class="page-header">
@@ -11,7 +20,7 @@
         <a href="{{url_for("main.rules")}}">rules</a>
       </div>
       <h2 class="page-title">
-        Rule Editor {{rule.label}}
+        Rule Editor: {{rule.label}}
       </h2>
     </div>
     <div class="col-auto ms-auto">
@@ -32,7 +41,7 @@
     <div class="col-4">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Edit Settings</h3>
+            <h3 class="card-title">Edit Settings{%if rule.enabled%}<span class="badge bg-green-lt badge-sm ml-2">Enabled</span>{%else%}<span class="badge bg-red-lt badge-sm ml-2">Disabled</span>{%endif%}</h3>
           </div>
           <div class="card-body">
 <!--haaaaaaa-->
@@ -77,6 +86,23 @@
                 <textarea class="form-control" name="remediation" rows="2" placeholder="Enter remediation">{{rule.remediation}}</textarea>
               </div>
             </div>
+            <div class="form-group mb-2 ">
+              <label class="form-label">Add Rule to Clusters</label>
+              <div>
+                <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+                <select size="4" id="cluster-select" autocomplete="off" multiple="multiple" name="clusters[]" class="form-control subheader cursor-pointer" data-placeholder="Clusters">
+                {%set rule_clusters = rule.clusters.all()%}
+                {% for cluster in clusters %}
+                  {%if cluster in rule_clusters %}
+                  <option value="{{cluster.id}}" selected>{{cluster.label|capitalize}}</option>
+                  {%else%}
+                  <option value="{{cluster.id}}">{{cluster.label|capitalize}}</option>
+                  {%endif%}
+                {% endfor %}
+                </select>
+                <small class="form-hint mt-2">Select which clusters you want your rule to apply to</small>
+              </div>
+            </div>
             <button type="submit" class="btn bg-cyan-lt mt-2">Save</div></button>
            </form>
           </div>
@@ -99,6 +125,10 @@
 {%endblock%}
 
 {% block extrajs %}
+  <script>
+    $('#cluster-select').chosen({width: '100%', skip_no_results: true,max_selected_options: 20});
+  </script>
+
   <script>
     $(document).ready(function() {
     $("#saveCode").click(function(){

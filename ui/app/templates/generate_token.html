@@ -20,7 +20,7 @@
     <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Generate Token for {{cluster.label}}</h3>
+            <h3 class="card-title">Generate Token for Cluster</h3>
           </div>
           <div class="card-body">
             <div> 
@@ -32,7 +32,7 @@
               <pre class="bg-transparent" id="show">&lt;Please generate your token above&gt;</pre>
             </div>
             <div class="mt-4">
-              <pre class="bg-transparent"># Use the token generated to authenticate from your cluster. Send the authentication token in the header (or request args) under the "token" key.<br>For example, here is what a request might look like with cURL<br><br>curl -H "token: &lt;token here&gt;" https://yourcluster<br><br>curl https://yourcluster?token=&lt;token here&gt;
+              <pre class="bg-transparent">The admission webhook requires the token to authenticate and forward events. The deployment manifest file for your Kubernetes cluster is here: <code>{{config["DEPLOYMENT_LINK"]}}</code><br><br>Check validity of a token here: <code>{{url_for("api.check_token_for_cluster",token="insertToken")}}</code>
               </pre>           
             </div>
           </div>
@@ -46,7 +46,7 @@
       $('#generate').click(function(){
         var duration=$("#duration").val();
         $.ajax({
-          url: "{{url_for("api.get_token_for_cluster",id=cluster.id)}}?id="+duration,
+          url: "{{url_for("api.get_token_for_cluster")}}?id="+duration,
           type: "GET",
           contentType: "application/json; charset=utf-8",
           success: function (response) {

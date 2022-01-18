@@ -92,7 +92,8 @@ input[type=number] {
     <div class="col-auto mb-2">
       <div class="subheader mb-2">Operations (or)</div>
       <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
-      <select size="4" autocomplete="off" multiple="multiple" name="operations[]" class="form-control subheader cursor-pointer {% if filters["operations"]%}is-valid{%endif%}" id="filter-operations" data-placeholder="operations">
+      <select size="4" autocomplete="off" multiple="multiple" name="operations[]" class="form-control subheader cursor-pointer {% if filters["operations"]%}is-valid{%endif%}" 
+id="filter-operations" data-placeholder="operations">
       {% for op in operation_list %}
         {%if op in filters["operations"] %}
         <option value="{{op|lower}}" selected>{{op|capitalize}}</option>

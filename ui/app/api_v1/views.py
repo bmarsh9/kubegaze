@@ -10,14 +10,21 @@ from datetime import datetime, timedelta
 def get_health():
     return jsonify({"message":"ok"})
 
-@api.route('/clusters/<int:id>/token', methods=['GET'])
+@api.route('/clusters/token', methods=['GET'])
 @login_required
-def get_token_for_cluster(id):
-    cluster = Cluster.query.get(id)
-    if not cluster:
-        return jsonify({"message":"cluster not found"}),404
-    token = cluster.generate_auth_token()
+def get_token_for_cluster():
+    token = Cluster.generate_auth_token()
     return jsonify({"token":token})
+
+@api.route('/clusters/token/check', methods=['GET'])
+def check_token_for_cluster():
+    token = request.args.get("token")
+    if not token:
+        return jsonify({"message":"token not found in request args"}),400
+    result = Cluster.verify_auth_token(token)
+    if not result:
+        return jsonify({"message":"authentication failed"}),401
+    return jsonify({"message":"ok"})
 
 @api.route('/cluster/<int:id>/events', methods=['POST'])
 #@cluster_auth

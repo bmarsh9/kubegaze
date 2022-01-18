@@ -40,19 +40,17 @@
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-vcenter table-bordered" id="example" style="width:100%">
-                <thead>
+                <thead class="bg-white-lt">
                   <tr>
-                    <th>Label</th>
-                    <th>Values</th>
-                    <th class="w-1">Edit</th>
+                    <th class="text-white">Label</th>
+                    <th class="w-1 text-white">Edit</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for rule in rules %}
                   <tr>
-                    <td class="subheader">{{rule.label}}</td>
-                    <td class="text-muted"><span class="badge bg-blue-lt">test</span></td>
-                    <td class="text-center"><a href="{{url_for("main.view_rule",id=rule.id)}}"><i class="ti ti-edit"></i></a></td>
+                    <td class="subheader text-white">{{rule.label}}</td>
+                    <td class="text-center"><a href="{{url_for("main.view_rule",id=rule.id)}}"><i class="ti ti-edit text-yellow"></i></a></td>
                   </tr>
                   {%endfor%}
                 </tbody>

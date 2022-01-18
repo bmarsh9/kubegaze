@@ -40,24 +40,24 @@
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-vcenter table-bordered" id="example" style="width:100%">
-                <thead>
+                <thead class="bg-white-lt">
                   <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Roles</th>
-                    <th class="w-1">Manage</th>
+                    <th class="text-white">ID</th>
+                    <th class="text-white">Name</th>
+                    <th class="text-white">Email</th>
+                    <th class="text-white">Roles</th>
+                    <th class="w-1 text-white">Manage</th>
                   </tr>
                 </thead>
                 <tbody>
                   {%for user in users%}
                   <tr>
-                    <td class="subheader">{{user.id}}</td>
-                    <td class="subheader">{{user.first_name}} {{user.last_name}}</td>
-                    <td class="subheader">{{user.email}}</td>
-                    <td>{%for role in user.pretty_roles()%}{%if role == "admin"%}<span class="badge bg-yellow-lt mr-1">{{role}}</span>{%else%}<span class="badge bg-blue-lt mr-1">{{role}}</span>{%endif%}{%endfor%}</td>
+                    <td class="subheader text-white">{{user.id}}</td>
+                    <td class="subheader text-white">{{user.first_name}} {{user.last_name}}</td>
+                    <td class="subheader text-white">{{user.email}}</td>
+                    <td>{%for role in user.pretty_roles()%}{%if role == "admin"%}<span class="badge bg-yellow-lt mr-1">{{role}}</span>{%else%}<span class="badge bg-orange-lt mr-1">{{role}}</span>{%endif%}{%endfor%}</td>
                     <td class="text-center">
-                      <a href="{{url_for("main.view_user",id=user.id)}}"><i class="ti ti-edit"></i></a>
+                      <a href="{{url_for("main.view_user",id=user.id)}}"><i class="ti ti-edit text-yellow"></i></a>
                     </td>
                   </tr>
                   {%endfor%}
@@ -77,4 +77,3 @@
   } );
 </script>
 {% endblock %}
-

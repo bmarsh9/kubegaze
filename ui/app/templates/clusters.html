@@ -20,8 +20,8 @@
     <div class="col-auto ms-auto">
       <div class="btn-list">
         <span class="d-none d-sm-inline">
-          <a href="{{url_for("main.add_rule")}}" class="btn bg-cyan-lt">
-            Add Cluster
+          <a href="{{url_for("main.generate_token_for_cluster")}}" class="btn bg-cyan-lt">
+            Generate Token
           </a>
         </span>
       </div>
@@ -40,17 +40,23 @@
           <div class="card-body">
             <div class="table-responsive">
               <table class="table table-vcenter table-bordered" id="example" style="width:100%">
-                <thead>
+                <thead class="bg-white-lt">
                   <tr>
-                    <th>Label</th>
-                    <th class="w-1">Edit</th>
+                    <th class="text-white">Label</th>
+                    <th class="text-white">Rules</th>
+                    <th class="text-white">Events</th>
+                    <th class="text-white">Alerts</th>
+                    <th class="w-1 text-white">Edit</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for cluster in clusters %}
                   <tr>
-                    <td class="subheader">{{cluster.label}}</td>
-                    <td class="text-center"><a href="{{url_for("main.view_cluster",id=cluster.id)}}"><i class="ti ti-edit"></i></a></td>
+                    <td class="subheader text-white">{{cluster.label}}</td>
+                    <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.get_rules()|length}}</span></td>
+                    <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.events.count()}}</span></td>
+                    <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.get_alerts()|length}}</span></td>
+                    <td class="text-center"><a href="{{url_for("main.view_cluster",id=cluster.id)}}"><i class="ti ti-edit text-yellow"></i></a></td>
                   </tr>
                   {%endfor%}
                 </tbody>

@@ -39,7 +39,8 @@ def rules():
 @login_required
 def view_rule(id):
     rule = Rule.query.get(id)
-    return render_template("view_rule.html",rule=rule)
+    clusters = Cluster.query.all()
+    return render_template("view_rule.html",rule=rule,clusters=clusters)
 
 @main.route('/rules/<int:id>/settings', methods=['POST'])
 @login_required
@@ -53,6 +54,8 @@ def update_rule_settings(id):
         rule.enabled = True
     else:
         rule.enabled = False
+    clusters = request.form.getlist('clusters[]')
+    rule.set_clusters_by_id(clusters)
     db.session.commit()
     flash("Updated settings")
     return redirect(url_for("main.view_rule",id=rule.id))
@@ -97,11 +100,7 @@ def events():
     return render_template("events.html",filters=filters,
         operation_list=operation_list,tags=tags,query_string=query_string)
 
-@main.route('/clusters/<int:id>/token', methods=['GET'])
+@main.route('/clusters/token', methods=['GET'])
 @login_required
-def generate_token_for_cluster(id):
-    cluster = Cluster.query.get(id)
-    if not cluster:
-        flash("Cluster does not exist","warning")
-        return redirect(url_for("main.home"))
-    return render_template("generate_token.html",cluster=cluster)
+def generate_token_for_cluster():
+    return render_template("generate_token.html")

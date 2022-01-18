@@ -24,6 +24,7 @@ class Config:
     BASE_DIR = basedir
     ENABLE_SELF_REGISTRATION = os.environ.get("ENABLE_SELF_REGISTRATION",False)
     DOC_LINK = os.environ.get("DOC_LINK","/")
+    DEPLOYMENT_LINK = os.environ.get("DEPLOYMENT_LINK","/")
 
     RESTRICTED_FIELDS = ["password_hash"]
 

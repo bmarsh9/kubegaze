@@ -21,6 +21,7 @@ class Alert(LogMixin,db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     rule_id = db.Column(db.Integer, db.ForeignKey('rules.id'), nullable=False)
+    cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -53,6 +54,23 @@ class Rule(LogMixin,db.Model, UserMixin):
             "clusters":clusters,
             "date_added":self.date_added
         }
+
+    def remove_from_all_clusters(self):
+        AssocRule.query.filter(AssocRule.rule_id == self.id).delete()
+        db.session.commit()
+        return True
+
+    def set_clusters_by_id(self,clusters):
+        self.remove_from_all_clusters()
+        if not isinstance(clusters,list):
+            clusters = [clusters]
+        for id in clusters:
+            found = Cluster.query.get(id)
+            if found:
+                assoc = AssocRule(rule_id=self.id,cluster_id=id)
+                db.session.add(assoc)
+        db.session.commit()
+        return True
 
     @staticmethod
     def add(uuid=None,label=None,description=None,code={}):
@@ -251,6 +269,15 @@ class Cluster(LogMixin,db.Model, UserMixin):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    def get_rules(self):
+        rules = []
+        for assoc in AssocRule.query.filter(AssocRule.cluster_id == self.id).all():
+            rules.append(Rule.query.get(assoc.rule_id))
+        return rules
+
+    def get_alerts(self):
+        return Alert.query.filter(Alert.cluster_id == self.id).all()
+
     @staticmethod
     def add(**kwargs):
         uuid = generate_uuid()
@@ -273,11 +300,14 @@ class Cluster(LogMixin,db.Model, UserMixin):
         except BadSignature:
             current_app.logger.warning("BadSignature for token")
             return None # invalid token
-        return Cluster.query.filter(Cluster.uuid == data["uuid"]).first()
+        if data.get("type") == "cluster":
+            return True
+        return False
 
-    def generate_auth_token(self):
+    @staticmethod
+    def generate_auth_token():
         s = Serializer(current_app.config['SECRET_KEY'])
-        token = s.dumps({ 'id': self.id, 'uuid': self.uuid })
+        token = s.dumps({"type":"cluster"})
         return token.decode("utf-8")
 
 class User(LogMixin,db.Model, UserMixin):
