@@ -61,6 +61,7 @@ def get_event_feed():
         date_sort=request.args.get('date_sort', "gt", type=str),
         date_added=date_added,
         last=request.args.get('last', 0, type=int),
+        alerts=int(request.args.get('alerts', 0, type=int)),
         limit=request.args.get('limit', 50, type=int),
     )
     return jsonify(events)

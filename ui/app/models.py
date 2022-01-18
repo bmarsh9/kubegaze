@@ -334,7 +334,7 @@ class Event(LogMixin,db.Model, UserMixin):
 
     @staticmethod
     def get_events_from_api_query(date_added=None,operations=[],tags=[],clusters=[],
-        name=None,namespace=None,uid=None,date_sort="gt",last=0,limit=50):
+        alerts=None,name=None,namespace=None,uid=None,date_sort="gt",last=0,limit=50):
         data = {"last":0,"events":[]}
         _query = Event.query
         if name:
@@ -353,6 +353,8 @@ class Event(LogMixin,db.Model, UserMixin):
         if tags:
             for tag in tags:
                 _query = _query.filter(Event.tags.any(name=tag.lower()))
+        if alerts:
+            _query = _query.filter(Event.alerts.any())
         if last:
             data["last"] = last
             _query = _query.filter(Event.id > last)

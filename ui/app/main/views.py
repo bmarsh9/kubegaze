@@ -90,6 +90,7 @@ def events():
     uid = request.args.get('uid', None, type=str)
     limit = request.args.get('limit', 50, type=int)
     update = request.args.get('update', 1, type=int)
+    alerts = request.args.get('alerts', 0, type=int)
     date_added = request.args.get('date_added', None, type=str)
     if not date_added:
         date_added = datetime.now() - timedelta(hours = 24)
@@ -99,7 +100,7 @@ def events():
     clusters = request.args.getlist('clusters')
     filters = {"name":name,"namespace":namespace,"tags":tags,"clusters":clusters,
         "operations":operations,"date_added":date_added,"date_sort":date_sort,
-        "limit":limit,"update":update,"uid":uid
+        "limit":limit,"update":update,"alerts":alerts,"uid":uid
     }
     cluster_list = Cluster.query.all()
     operation_list = Event.get_operations_in_list()

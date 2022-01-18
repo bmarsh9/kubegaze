@@ -149,6 +149,18 @@ input[type=number] {
         </label>
       </div>
     </div>
+    <div class="col-auto mb-2">
+      <div>
+        <label class="row">
+          <span class="col mb-2 mt-2">Alerts Only</span>
+          <span class="col-auto mb-2 mt-2">
+            <label class="form-check form-check-single form-switch">
+              <input id="alerts" class="form-check-input cursor-pointer" type="checkbox" {% if filters["alerts"]%}checked=""{%endif%}>
+            </label>
+          </span>
+        </label>
+      </div>
+    </div>
     <div class="col-auto ms-auto">
       <div class="btn-list">
         <span class="d-none d-sm-inline">
@@ -175,6 +187,7 @@ input[type=number] {
     var uid = $("#uid").val()
     var limit = $("#limit").val()
     var update = $("#update").is(":checked")
+    var alerts = $("#alerts").is(":checked")
     var date_added = $("#datepicker-icon-prepend").val()
     var date_sort = $("#date_sort").val()
     var tags = $("#filter-tags").val()
@@ -194,6 +207,11 @@ input[type=number] {
         dict.update = 1;
     } else {
         dict.update = 0;
+    };    
+    if (alerts) {
+        dict.alerts = 1;
+    } else {
+        dict.alerts = 0;
     };    
     if (limit) {
         dict.limit = limit;
