@@ -51,14 +51,16 @@ KubeGaze supports an agent/server model. You install the agent (which is just a 
 4. Run: `docker-compose up -d postgres_db && sleep 10 && docker-compose up -d kubegaze_ui kubegaze_poller` to install the server components
 5. After a few seconds, open your browser to `https://your-ip` and the default username:password is `admin@example.com:admin`
 6. At this point, you should be logged into the server component
+7. Navigate to the `Clusters` tab and click the first cluster `edit` button. Click `Generate Token` and the button `Generate`. The token should populate, save this for the agent below.
 
 ##### Install the agent (webhook container)
 1. Clone the repo (if you havent already)
 2. Navigate to the `kubegaze` folder (top level directory)
 3. Update the `SERVER_URL` value in the file `config/deployment.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
-4. (Back in top level directory) Create secret: `kubectl --namespace=webhook create secret tls webhook-certs --cert=keys/server.crt --key=keys/server.key`
-5. Apply the webhook deployment (check logs of the deployed pod for errors): `kubectl apply -f config/deployment.yaml`
-6. Apply the webhook configuration: `kubectl apply -f config/validate.yaml`
+4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L51). The token is generated in the `Install the server` section
+5. (Back in top level directory) Create secret: `kubectl --namespace=webhook create secret tls webhook-certs --cert=keys/server.crt --key=keys/server.key`
+6. Apply the webhook deployment (check logs of the deployed pod for errors): `kubectl apply -f config/deployment.yaml`
+7. Apply the webhook configuration: `kubectl apply -f config/validate.yaml`
 
 If all goes smoothly, you can head back to the `Events` page in the server portion and you should see events flowing in.
 
