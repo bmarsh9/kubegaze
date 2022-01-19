@@ -15,23 +15,24 @@ def check_token_for_cluster():
     token = request.args.get("token")
     if not token:
         return jsonify({"message":"token not found in request args"}),400
-    result = Cluster.verify_auth_token(token)
-    if not result:
-        return jsonify({"message":"authentication failed"}),401
-    return jsonify({"message":"ok"})
-
-@api.route('/clusters/token', methods=['GET'])
-@login_required
-def get_token_for_cluster():
-    token = Cluster.generate_auth_token()
-    return jsonify({"token":token})
-
-@api.route('/cluster/<int:id>/events', methods=['POST'])
-#@cluster_auth
-def post_events_from_cluster(id):
-    cluster = Cluster.query.get(id)
+    cluster = Cluster.verify_auth_token(token)
     if not cluster:
-        return jsonify({"message":"cluster not found"}),404
+        return jsonify({"message":"authentication failed"}),401
+    return jsonify({"message":"ok","cluster":cluster.label,"uuid":cluster.uuid})
+
+@api.route('/clusters/<int:id>/token', methods=['GET'])
+@login_required
+def get_token_for_cluster(id):
+    cluster = Cluster.query.get(id)
+    return jsonify({"token":cluster.generate_auth_token(cluster.uuid)})
+
+@api.route('/cluster/events', methods=['POST'])
+@cluster_auth
+def post_events_from_cluster(cluster=None):
+    if current_app.config["DISABLE_CLUSTER_AUTH"] == "yes":
+        cluster = Cluster.query.get(request.args.get("cluster_id",0))
+        if not cluster:
+            return jsonify({"message":"cluster not found. cluster authentication is disabled"}),404
     data = request.get_json()
     event = Event(uid=data["request"]["uid"],
         apiversion=data["apiVersion"],
@@ -43,7 +44,17 @@ def post_events_from_cluster(id):
     )
     cluster.events.append(event)
     db.session.commit()
-    return jsonify({"message":"ok"})
+    return jsonify(
+        {
+            "apiVersion": "admission.k8s.io/v1",
+            "kind": "AdmissionReview",
+            "response": {
+                "allowed": True,
+                "uid": request.json["request"]["uid"],
+                "status": {"message": "ok"},
+            }
+        }
+    )
 
 @api.route('/feed', methods=['GET'])
 @login_required

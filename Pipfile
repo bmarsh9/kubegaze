@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 flask = "*"
 gunicorn = "*"
-jsonpatch = "*"
 requests = "*"
 
 [dev-packages]

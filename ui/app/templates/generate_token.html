@@ -18,22 +18,32 @@
 {%block content%}
   <div class="row row-cards mb-3">
     <div class="col-12">
+        <div class="alert alert-warning text-white bg-transparent" role="alert">
+          <small>The admission webhook requires the token to authenticate and forward events. The deployment manifest file for your Kubernetes cluster is here: <code>{{config["DEPLOYMENT_LINK"]}}</code></small>
+        </div>
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Generate Token for Cluster</h3>
           </div>
           <div class="card-body">
             <div> 
-              <label class="form-label">Enter duration of the time (in seconds) before it expires</label>
+              <label class="form-label">Enter duration of the time (in seconds) before it expires (leave empty if you dont want it to expire)</label>
               <div class="input-group mb-2"><input type="number" id="duration" class="form-control" placeholder="Enter duration of the token"></div><button class="btn" id="generate" type="button">Generate</button>
             </div>
             <div class="hr-text"></div>
             <div class="mt-4">
-              <pre class="bg-transparent" id="show">&lt;Please generate your token above&gt;</pre>
+              <pre class="bg-transparent" id="show">&lt;Please click "Generate" above&gt;</pre>
             </div>
             <div class="mt-4">
-              <pre class="bg-transparent">The admission webhook requires the token to authenticate and forward events. The deployment manifest file for your Kubernetes cluster is here: <code>{{config["DEPLOYMENT_LINK"]}}</code><br><br>Check validity of a token here: <code>{{url_for("api.check_token_for_cluster",token="insertToken")}}</code>
-              </pre>           
+              <pre class="bg-transparent">
+                # deployment file environment variables<br>
+                env:
+                  - name: SERVER_URL
+                    value: "https://&lt;your-server-address&gt;/api/v1/cluster/events"
+                  - name: TOKEN
+                    value: "&lt;cluster token&gt;"
+              </pre>
+              <pre class="bg-transparent">Check validity of a token here: <code>{{url_for("api.check_token_for_cluster",token="insertToken")}}</code></pre>
             </div>
           </div>
         </div>
@@ -46,7 +56,7 @@
       $('#generate').click(function(){
         var duration=$("#duration").val();
         $.ajax({
-          url: "{{url_for("api.get_token_for_cluster")}}?id="+duration,
+          url: "{{url_for("api.get_token_for_cluster",id=cluster.id)}}?id="+duration,
           type: "GET",
           contentType: "application/json; charset=utf-8",
           success: function (response) {

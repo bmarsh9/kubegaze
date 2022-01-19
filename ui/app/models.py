@@ -408,18 +408,18 @@ class Cluster(LogMixin,db.Model, UserMixin):
             data = s.loads(token)
         except SignatureExpired:
             current_app.logger.warning("SignatureExpired for token")
-            return None # valid token, but expired
+            return False # valid token, but expired
         except BadSignature:
             current_app.logger.warning("BadSignature for token")
-            return None # invalid token
-        if data.get("type") == "cluster":
-            return True
-        return False
+            return False # invalid token
+        cluster = Cluster.query.filter(Cluster.uuid == data["cluster_uuid"]).first()
+        if not cluster:
+            return False
+        return cluster
 
-    @staticmethod
-    def generate_auth_token():
+    def generate_auth_token(self, uuid):
         s = Serializer(current_app.config['SECRET_KEY'])
-        token = s.dumps({"type":"cluster"})
+        token = s.dumps({"cluster_uuid":uuid})
         return token.decode("utf-8")
 
 class User(LogMixin,db.Model, UserMixin):

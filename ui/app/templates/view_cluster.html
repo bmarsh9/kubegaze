@@ -1,7 +1,29 @@
 {% extends "layouts/condensed.html" %}
 
-{%block contentHeader_pretitle%}<a href="{{url_for("main.clusters")}}">clusters</a>{%endblock%}
-{%block contentHeader_title%}View Cluster{%endblock%}
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        <a href="{{url_for("main.clusters")}}">clusters</a>
+      </div>
+      <h2 class="page-title">
+        View Cluster
+      </h2>
+    </div>
+    <div class="col-auto ms-auto d-print-none">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.generate_token_for_cluster",id=cluster.id)}}" class="btn bg-cyan-lt">
+            Generate Token
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
 
 {%block content%}
   <div class="row row-cards">

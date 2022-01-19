@@ -38,16 +38,19 @@ spec:
       containers:
         - name: webhook
           image: bmarsh13/k8_audit:1.0.1
-#          image: garethr/hook:tilt-453b50a06ab920b5
-#          image: bmarsh13/spate-ui:2.2.1
-#          image: nginx
-#          imagePullPolicy: IfNotPresent
           imagePullPolicy: Always
           args:
             - "--bind=0.0.0.0:443"
             - "--certfile=/certs/tls.crt"
             - "--keyfile=/certs/tls.key"
             - "app:app"
+          env:
+            - name: SERVER_URL
+              value: "http://192.168.1.252:5000/api/v1/cluster/events"
+            - name: TOKEN
+              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjU1OTMyNCwiZXhwIjoxNjQyNTYyOTI0fQ.eyJjbHVzdGVyX3V1aWQiOiI4ZTRmYjBmNTgwZDc0ZTZlOWM5NGNjMzRiNmY5OTk0YiJ9.izRrtXURTuB80uRfGEfQH79pzMjlnYNPUWLa8q7m9rilWAhSFzfg8IWA5yPHHWihgGvDhkFcEXjtFHrlIfA5yg"
+            - name: IGNORE_CERT
+              value: "yes"
           volumeMounts:
             - readOnly: true
               mountPath: /certs

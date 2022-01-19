@@ -24,6 +24,13 @@ def view_cluster(id):
     cluster = Cluster.query.get(id)
     return render_template("view_cluster.html",cluster=cluster)
 
+@main.route('/clusters/add', methods=['GET','POST'])
+@login_required
+def add_cluster():
+    new_cluster = Cluster.add()
+    flash("Added Cluster")
+    return redirect(url_for("main.view_cluster",id=new_cluster.id))
+
 @main.route('/tags', methods=['GET'])
 @login_required
 def tags():
@@ -117,7 +124,8 @@ def view_alerts_for_event(id):
     return render_template("view_alerts_for_event.html",event=event,
         json_data=json_data)
 
-@main.route('/clusters/token', methods=['GET'])
+@main.route('/clusters/<int:id>/token', methods=['GET'])
 @login_required
-def generate_token_for_cluster():
-    return render_template("generate_token.html")
+def generate_token_for_cluster(id):
+    cluster = Cluster.query.get(id)
+    return render_template("generate_token.html",cluster=cluster)

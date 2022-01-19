@@ -26,10 +26,10 @@ class Config:
     DOC_LINK = os.environ.get("DOC_LINK","/")
     DEPLOYMENT_LINK = os.environ.get("DEPLOYMENT_LINK","/")
 
-    RESTRICTED_FIELDS = ["password_hash"]
-
     DEFAULT_EMAIL = os.environ.get("DEFAULT_EMAIL", "admin@example.com")
     DEFAULT_PASSWORD = os.environ.get("DEFAULT_PASSWORD", "admin")
+
+    DISABLE_CLUSTER_AUTH = os.environ.get("DISABLE_CLUSTER_AUTH", "no")
 
     @staticmethod
     def init_app(app):

@@ -115,6 +115,8 @@ def roles_required(*role_names):
 def cluster_auth(view_function):
     @wraps(view_function)    # Tells debuggers that is is a function wrapper
     def decorator(*args, **kwargs):
+        if current_app.config["DISABLE_CLUSTER_AUTH"] == "yes":
+            return view_function(cluster=None,*args, **kwargs)
         #// Try to authenticate with an token (API login, must have token in HTTP header)
         token_in_header = request.headers.get("token")
         token_in_url = request.args.get("token")
@@ -123,5 +125,5 @@ def cluster_auth(view_function):
         cluster = Cluster.verify_auth_token(token_in_header or token_in_url)
         if not cluster:
             return jsonify({"message":"Authentication failed. Bad token"}),401
-        return view_function(*args, **kwargs)
+        return view_function(cluster=cluster,*args, **kwargs)
     return decorator

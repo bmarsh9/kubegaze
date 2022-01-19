@@ -249,8 +249,10 @@ input[type=number] {
 </script>
   <script>
     $(document).ready(function() {
-        (function worker(last=0) {
+        (async function worker(last=0) {
           $("#loading").html('<div style="width:3rem;height:3rem" class="spinner-grow" role="status"></div>');
+          await new Promise(r => setTimeout(r, 1000));
+
           $.ajax({
             url: "/api/v1/feed?"+"{{query_string|safe}}"+"&last="+last,
             success: function(data) {
