@@ -57,7 +57,7 @@ KubeGaze supports an agent/server model. You install the agent (which is just a 
 2. Navigate to the `kubegaze` folder (top level directory)
 3. Update the `SERVER_URL` value in the file `config/deployment.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
 4. (Back in top level directory) Create secret: `kubectl --namespace=webhook create secret tls webhook-certs --cert=keys/server.crt --key=keys/server.key`
-5. Apply the webhook deployment: `kubectl apply -f config/deployment.yaml`
+5. Apply the webhook deployment (check logs of the deployed pod for errors): `kubectl apply -f config/deployment.yaml`
 6. Apply the webhook configuration: `kubectl apply -f config/validate.yaml`
 
 If all goes smoothly, you can head back to the `Events` page in the server portion and you should see events flowing in.
