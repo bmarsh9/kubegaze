@@ -4,6 +4,12 @@
 
 #### Get started in 1 minute!
 
+### Table of Contents
+1. [What is KubeGaze?](#what-is-kubegaze)
+2. [Use Case](#use-case)
+3. [How it Works](#how-it-works)
+4. [Getting Started](#getting-started)
+
 Stream and filter events          |  
 :-------------------------:|
 ![](ui/app/static/img/kubegaze_2.PNG)  |
@@ -19,6 +25,21 @@ Create custom/dynamic alerts          |
 View alerts for your k8 events          |  
 :-------------------------:|
 ![](ui/app/static/img/kubegaze_4.PNG)  |
+
+### What is KubeGaze
+
+KubeGaze is a security monitoring tool for Kubernetes clusters. At a high level, it consumes events from your cluster and allows you to write rules/alerts that trigger on specific events. For example, if someone tries to deploy a container running as root or pulling a image from a unauthorized registry, you can trigger on that. The beauty of KubeGaze is that the rule engine is just very basic Python code. No need to learn another language. Also, KubeGaze has an agent/server model so it can support any number of clusters.
+
+### Use Case
+
+The most popular use case is likely a security monitoring (CSIRT) team that wants to monitor all of their Kubernetes clusters at scale. You can organize all your rules in a single place and create basic or complex rules.
+
+### How it Works
+
+KubeGaze supports an agent/server model. You install the agent (which is just a K8 Admission Webhook) in your cluster and the server portion can be deployed anywhere. Once the webhook is installed, it forwards events from the Kubernetes API server to the server portion. This allows you to deploy it anywhere and consolidate events from all of your clusters.
+
+### Getting Started
+
 
 
 #### Getting the cluster started
