@@ -2,7 +2,7 @@ from flask import jsonify, request, current_app
 from . import api
 from app.models import *
 from flask_login import login_required
-from app.utils.decorators import roles_required,cluster_auth
+from app.utils.decorators import roles_required,cluster_auth,poller_auth
 from app.utils.misc import generate_uuid
 from datetime import datetime, timedelta
 
@@ -19,6 +19,16 @@ def check_token_for_cluster():
     if not cluster:
         return jsonify({"message":"authentication failed"}),401
     return jsonify({"message":"ok","cluster":cluster.label,"uuid":cluster.uuid})
+
+@api.route('/poller/token/check', methods=['GET'])
+def check_token_for_poller():
+    token = request.args.get("token")
+    if not token:
+        return jsonify({"message":"token not found in request args"}),400
+    poller = Cluster.verify_poller_token(token)
+    if not poller:
+        return jsonify({"message":"authentication failed"}),401
+    return jsonify({"message":"ok"})
 
 @api.route('/clusters/<int:id>/token', methods=['GET'])
 @login_required
@@ -101,7 +111,7 @@ def update_color_for_tag(id,color):
     return jsonify({"message":"ok"})
 
 @api.route('/rules', methods=['GET'])
-#@poller_auth
+@poller_auth
 def get_rules():
     data = []
     for rule in Rule.query.filter(Rule.hide == False).filter(Rule.enabled == True).all():
@@ -109,7 +119,7 @@ def get_rules():
     return jsonify(data)
 
 @api.route('/events', methods=['GET'])
-#@poller_auth
+@poller_auth
 def get_events():
     data = []
     for event in Event.query.filter(Event.seen == False).order_by(Event.id.desc()).limit(100).all():
@@ -117,7 +127,7 @@ def get_events():
     return jsonify(data)
 
 @api.route('/hits', methods=['POST'])
-#@poller_auth
+@poller_auth
 def post_hits():
     data = request.get_json()
     for record in data:

@@ -31,6 +31,12 @@ def add_cluster():
     flash("Added Cluster")
     return redirect(url_for("main.view_cluster",id=new_cluster.id))
 
+@main.route('/site', methods=['GET'])
+@login_required
+def site():
+    cluster = Cluster
+    return render_template("site.html",cluster=cluster)
+
 @main.route('/risk', methods=['GET'])
 @login_required
 def risk():

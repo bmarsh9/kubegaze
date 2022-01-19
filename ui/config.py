@@ -30,6 +30,7 @@ class Config:
     DEFAULT_PASSWORD = os.environ.get("DEFAULT_PASSWORD", "admin")
 
     DISABLE_CLUSTER_AUTH = os.environ.get("DISABLE_CLUSTER_AUTH", "no")
+    DISABLE_POLLER_AUTH = os.environ.get("DISABLE_POLLER_AUTH", "no")
 
     @staticmethod
     def init_app(app):

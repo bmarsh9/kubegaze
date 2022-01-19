@@ -123,19 +123,19 @@ class Rule(LogMixin,db.Model, UserMixin):
     def get_table_for_rule_details(self):
         template = ""
         shell_template = """
-                                  <div class="table-responsive rounded-2">
-                                    <table class="table table-vcenter">
-                                      <thead class="bg-secondary">
-                                        <tr>
-                                          <th class="w-1 text-white">Key</th>
-                                          <th class="text-white">Value</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                      {}
-                                      </tbody>
-                                    </table>
-                                  </div>
+          <div class="table-responsive rounded-2">
+            <table class="table table-vcenter">
+              <thead class="bg-secondary">
+                <tr>
+                  <th class="w-1 text-white">Key</th>
+                  <th class="text-white">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+              {}
+              </tbody>
+            </table>
+          </div>
         """
         row_template = """
           <tr>
@@ -420,6 +420,27 @@ class Cluster(LogMixin,db.Model, UserMixin):
     def generate_auth_token(self, uuid):
         s = Serializer(current_app.config['SECRET_KEY'])
         token = s.dumps({"cluster_uuid":uuid})
+        return token.decode("utf-8")
+
+    @staticmethod
+    def verify_poller_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            current_app.logger.warning("SignatureExpired for token")
+            return False # valid token, but expired
+        except BadSignature:
+            current_app.logger.warning("BadSignature for token")
+            return False # invalid token
+        if data.get("type") == "poller":
+            return True
+        return False
+
+    @staticmethod
+    def generate_poller_token():
+        s = Serializer(current_app.config['SECRET_KEY'])
+        token = s.dumps({"type":"poller"})
         return token.decode("utf-8")
 
 class User(LogMixin,db.Model, UserMixin):

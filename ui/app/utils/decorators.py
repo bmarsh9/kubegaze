@@ -127,3 +127,19 @@ def cluster_auth(view_function):
             return jsonify({"message":"Authentication failed. Bad token"}),401
         return view_function(cluster=cluster,*args, **kwargs)
     return decorator
+
+def poller_auth(view_function):
+    @wraps(view_function)    # Tells debuggers that is is a function wrapper
+    def decorator(*args, **kwargs):
+        if current_app.config["DISABLE_POLLER_AUTH"] == "yes":
+            return view_function(*args, **kwargs)
+        #// Try to authenticate with an token (API login, must have token in HTTP header)
+        token_in_header = request.headers.get("token")
+        token_in_url = request.args.get("token")
+        if not token_in_header and not token_in_url:
+            return jsonify({"message":"Authentication failed. Token not found"}),401
+        poller = Cluster.verify_poller_token(token_in_header or token_in_url)
+        if not poller:
+            return jsonify({"message":"Authentication failed. Bad token"}),401
+        return view_function(cluster=cluster,*args, **kwargs)
+    return decorator

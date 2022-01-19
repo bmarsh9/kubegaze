@@ -1,0 +1,42 @@
+{% extends "layouts/condensed.html" %}
+
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True) }}
+{% endblock %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        site
+      </div>
+      <h2 class="page-title">
+        Site Settings
+      </h2>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="alert alert-warning text-white bg-transparent" role="alert">
+         <small>Site configuration</small>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Settings</h3>
+          </div>
+          <div class="card-body">
+            <h4>Poller Authentication Token</h4>
+            <p class="small">The token below is set to the <code>TOKEN</code> environment variable on the poller. This token allows the poller to authenticate to specific API endpoints. Check validity here: <code>{{url_for("api.check_token_for_poller")}}?token=yourToken</code></p>
+            <pre class="bg-transparent text-white">{{cluster.generate_poller_token()}}</pre>
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}
