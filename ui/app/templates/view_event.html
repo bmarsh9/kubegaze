@@ -1,0 +1,44 @@
+{% extends "layouts/condensed.html" %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        events
+      </div>
+      <h2 class="page-title">
+        View Event
+      </h2>
+    </div>
+    {%if event.alerts.count()%}
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.view_alerts_for_event",id=event.id)}}" class="btn bg-orange-lt">
+            View Alerts
+          </a>
+        </span>
+      </div>
+    </div>
+    {%endif%}
+  </div>
+</div>
+{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Event: {{event.name}}</h3>
+          </div>
+          <div class="card-body">
+            <pre class="text-dark">
+            {{jsonevent}}
+            </pre>
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}

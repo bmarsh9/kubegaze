@@ -280,7 +280,7 @@ class Event(LogMixin,db.Model, UserMixin):
                           <div class="card bg-light">
                               <div class="card-header">
                                 <h3 class="card-title">Event Spec</h3>
-                                <div class="card-actions"><i class="ti ti-apple icon"></i></div>
+                                <div class="card-actions"><a href="/events/{}" class="btn text-dark"><i class="ti ti-external-link"></i></a></div>
                               </div>
                               <div class="card-body scroll">
                                 <pre>{}</pre>
@@ -318,7 +318,7 @@ class Event(LogMixin,db.Model, UserMixin):
                   </div>
                 </div>
               </div>""".format(seen,self.id,self.id,self.id,ribbon,self.id,self.kind,self.name,
-                  self.date_added,labels_html,self.id,self.id,self.id,json.dumps(self.data,indent=4),
+                  self.date_added,labels_html,self.id,self.id,self.id,self.id,json.dumps(self.data,indent=4),
                   self.get_table_for_event_details())
 
         return template

@@ -1,0 +1,82 @@
+{% extends "layouts/condensed.html" %}
+
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True) }}
+{% endblock %}
+
+{%block contentHeader%}
+<div class="page-header">
+  <div class="row align-items-center">
+    <div class="col">
+      <div class="page-pretitle">
+        Risk
+      </div>
+      <h2 class="page-title">
+        View Risk
+      </h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <div class="btn-list">
+        <span class="d-none d-sm-inline">
+          <a href="{{url_for("main.home")}}" class="btn bg-cyan-lt">
+            See Dashboard
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock%}
+
+{%block content%}
+  <div class="row row-cards">
+    <div class="col-12">
+        <div class="alert alert-warning text-white bg-transparent" role="alert">
+          <small>This page will try to show the risk of your clusters. The events below are grouped by the name of the resource, DELETE operation is filtered out and sorted by the date (descending) to eliminate duplicates.</small>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Events <span class="badge bg-red text-white badge-sm ml-2">{{events|length}}</span></h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-bordered" id="example" style="width:100%">
+                <thead class="bg-white-lt">
+                  <tr>
+                    <th class="text-white">Name</th>
+                    <th class="text-white">Cluster</th>
+                    <th class="text-white">Namespace</th>
+                    <th class="text-white w-1">Operation</th>
+                    <th class="text-white w-1">Alerts</th>
+                    <th class="w-1 text-white">View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for event in events %}
+                    {%set alerts = event.alerts.count()%}
+                  <tr>
+                    <td class="subheader text-white">{{event.name}}</td>
+                    <td class="subheader text-white">{{event.cluster.label}}</td>
+                    <td class="subheader text-white">{{event.namespace}}</td>
+                    <td class="subheader text-white">{{event.operation}}</td>
+                    <td class="subheader text-white">{%if alerts%}<span class="badge bg-red text-white badge-sm ml-2">{{alerts}}</span>{%else%}<span class="badge bg-white-lt text-dark badge-sm ml-2">0</span>{%endif%}</td>
+                    <td class="text-center"><a href="{{url_for("main.view_alerts_for_event",id=event.id)}}"><i class="ti ti-external-link text-yellow"></i></a></td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+              </table>
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}
+
+{%block extrajs%}
+<script>
+  $(document).ready(function() {
+    $('#example').DataTable({"pageLength":50,"order": [[ 0, "desc" ]]});
+  } );
+</script>
+{% endblock %}

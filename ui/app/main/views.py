@@ -31,6 +31,12 @@ def add_cluster():
     flash("Added Cluster")
     return redirect(url_for("main.view_cluster",id=new_cluster.id))
 
+@main.route('/risk', methods=['GET'])
+@login_required
+def risk():
+    events = Event.query.filter(Event.namespace != "webhook").filter(Event.operation != "DELETE").order_by(Event.name, Event.date_added.desc()).distinct(Event.name).all()
+    return render_template("risk.html",events=events)
+
 @main.route('/tags', methods=['GET'])
 @login_required
 def tags():
@@ -115,6 +121,14 @@ def events():
     query_string = request.query_string.decode("utf-8")
     return render_template("events.html",filters=filters,cluster_list=cluster_list,
         operation_list=operation_list,tags=tags,query_string=query_string)
+
+@main.route('/events/<int:id>', methods=['GET'])
+@login_required
+def view_event(id):
+    event = Event.query.get(id)
+    return render_template("view_event.html",
+        jsonevent=json.dumps(event.data,indent=4),
+        event=event)
 
 @main.route('/events/<int:id>/alerts', methods=['GET'])
 @login_required
