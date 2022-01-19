@@ -37,7 +37,7 @@ services:
       - UI_HOST=https://192.168.1.252
       - IGNORE_CERT=yes
       - SLEEP_TIME=20
-      - TOKEN=eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYyMjE2MCwiZXhwIjoxNjQyNjI1NzYwfQ.eyJ0eXBlIjoicG9sbGVyIn0.qZpx1LDT4ytkNGb3pjFc232evyqOvtmAeN2ICSGxQv2E_2sanw53OilPSSjlz9GSDOOiOnjxDmja-cELPgtulg
+      - TOKEN=eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYzMjc5NywiZXhwIjoxNjc0MTY4Nzk3fQ.eyJ0eXBlIjoicG9sbGVyIn0.3yynr0lCM1gcKVDkMSBgqKrOBzaFPr49igfvgPXmONW17PQGG9h0JOhT8czViYVWm_OO-5rZT09D-s1UAZ_M6A
   postgres_db:
     container_name: postgres_db
     image: postgres
