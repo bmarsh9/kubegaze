@@ -2,6 +2,12 @@
   <img height="120px" src="https://github.com/bmarsh9/kubegaze/blob/18df6b7e0d565c8f41fc4600c229811c56b2f2b7/ui/app/static/img/kubegaze_full.png" alt="Logo"/>
 </p>
 
+#### Get started in 1 minute!
+
+Stream and filter events          |  
+:-------------------------:|
+![](ui/app/static/img/kubegaze_2.PNG)  |
+
 #### Getting the cluster started
 sudo snap install microk8s --classic
 sudo microk8s.status --wait-ready
