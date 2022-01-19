@@ -8,6 +8,19 @@ Stream and filter events          |
 :-------------------------:|
 ![](ui/app/static/img/kubegaze_2.PNG)  |
 
+High level dashboards          |  
+:-------------------------:|
+![](ui/app/static/img/kubegaze_1.PNG)  |
+
+Create custom/dynamic alerts          |  
+:-------------------------:|
+![](ui/app/static/img/kubegaze_3.PNG)  |
+
+View alerts for your k8 events          |  
+:-------------------------:|
+![](ui/app/static/img/kubegaze_4.PNG)  |
+
+
 #### Getting the cluster started
 sudo snap install microk8s --classic
 sudo microk8s.status --wait-ready
