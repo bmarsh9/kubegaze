@@ -15,14 +15,7 @@ RUN apk add --no-cache --update openssl
 COPY tasks.py /app/
 ENTRYPOINT ["invoke", "keys"]
 
-
-#FROM dev-base AS Test
-#COPY src /app
-#RUN pipenv check --system
-#RUN pytest
-
 FROM base as Prod
 COPY src /app
-#RUN pip3 install -r /app/requirements.txt
 ENTRYPOINT ["gunicorn"]
 CMD ["app:app"]
