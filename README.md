@@ -47,9 +47,10 @@ KubeGaze supports an agent/server model. You install the agent (which is just a 
 ##### Install the server
 1. Clone the repo
 2. Navigate to the `kubegaze/ui` folder
-3. Run: `docker-compose up -d postgres_db && sleep 10 && docker-compose up -d kubegaze_ui kubegaze_poller` to install the server components
-4. After a few seconds, open your browser to `https://your-ip` and the default username:password is `admin@example.com:admin`
-5. At this point, uou should be logged into the server component
+3. Update the `UI_HOST` value [here](https://github.com/bmarsh9/kubegaze/blob/main/ui/docker-compose.yml#L37) to your server address
+4. Run: `docker-compose up -d postgres_db && sleep 10 && docker-compose up -d kubegaze_ui kubegaze_poller` to install the server components
+5. After a few seconds, open your browser to `https://your-ip` and the default username:password is `admin@example.com:admin`
+6. At this point, uou should be logged into the server component
 
 ##### Install the agent (webhook container)
 1. Clone the repo (if you havent already)
