@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: bmarsh13/k8_audit:1.0.1
+          image: bmarsh13/kubegaze-webhook:1.0.0
           imagePullPolicy: Always
           args:
             - "--bind=0.0.0.0:443"
@@ -46,9 +46,9 @@ spec:
             - "app:app"
           env:
             - name: SERVER_URL
-              value: "http://192.168.1.252:5000/api/v1/cluster/events"
+              value: "https://192.168.1.252/api/v1/cluster/events"
             - name: TOKEN
-              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjU1OTMyNCwiZXhwIjoxNjQyNTYyOTI0fQ.eyJjbHVzdGVyX3V1aWQiOiI4ZTRmYjBmNTgwZDc0ZTZlOWM5NGNjMzRiNmY5OTk0YiJ9.izRrtXURTuB80uRfGEfQH79pzMjlnYNPUWLa8q7m9rilWAhSFzfg8IWA5yPHHWihgGvDhkFcEXjtFHrlIfA5yg"
+              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYyMjg4OCwiZXhwIjoxNjQyNjI2NDg4fQ.eyJjbHVzdGVyX3V1aWQiOiI3YWQwOWU2ZTY1NjI0ZGZmOTM2ZTEwZGQ2YzViYjQyZSJ9.O2p1nhViYsiF2gtlhFtvXTaiE3nt02UD3ErMZFrGGT42u-IlswgKniRUBhqTM0O203VkGni_LEapXsX6LPIF5g"
             - name: IGNORE_CERT
               value: "yes"
           volumeMounts:

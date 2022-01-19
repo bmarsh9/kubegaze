@@ -141,5 +141,5 @@ def poller_auth(view_function):
         poller = Cluster.verify_poller_token(token_in_header or token_in_url)
         if not poller:
             return jsonify({"message":"Authentication failed. Bad token"}),401
-        return view_function(cluster=cluster,*args, **kwargs)
+        return view_function(*args, **kwargs)
     return decorator

@@ -7,13 +7,13 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
 RUN apt install -y python3-pip nano libpq-dev net-tools sudo libssl-dev
 
 # copy the folder to the container:
-ADD . /spate
+ADD . /ui
 
 # Define working directory:
-WORKDIR /spate
+WORKDIR /ui
 
 # Install the requirements
-RUN pip3 install -r /spate/requirements.txt
+RUN pip3 install -r /ui/requirements.txt
 
 # expose tcp port 5000
 #EXPOSE 5000

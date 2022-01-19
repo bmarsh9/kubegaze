@@ -1,18 +1,3 @@
-<p align="center">
-  <img height="120px" src="https://github.com/bmarsh9/spate/raw/de65a206015f1119db5981f21fc3974b8a8c8c7f/app/static/img/spate_full.PNG" alt="Logo"/>
-</p>
-
-Discord: https://discord.gg/9unhWAqadg  
-Official Integrations: https://github.com/bmarsh9/spate-operators
-
-### [Read the documentation to get started](https://bmarsh9.github.io/spate/)
-
-View Results           |  Create Workflows
-:-------------------------:|:-------------------------:
-![](https://github.com/bmarsh9/spate/blob/7947fa3e00af25916b7c551e787ea58e7c133a70/app/static/img/spate_dash1.PNG)  |  ![](https://github.com/bmarsh9/spate/blob/7947fa3e00af25916b7c551e787ea58e7c133a70/app/static/img/spate_dash2.PNG)
-
-### [Read the documentation to get started](https://bmarsh9.github.io/spate/)
-
 #### Help
 
 ##### Clean docker  
@@ -27,3 +12,7 @@ View Results           |  Create Workflows
 ##### Git  
 `git branch <branch>`  
 `git checkout <branch>`  
+
+
+#### docker
+docker-compose up -d postgres_db && sleep 10 && docker-compose up -d kubegaze_ui kubegaze_poller

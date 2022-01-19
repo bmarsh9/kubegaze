@@ -7,12 +7,14 @@ def get_rules(app, logging):
     if not app.UI_HOST:
         logging.error("UI_HOST env variable is not set")
         return False
+    if not app.TOKEN:
+        logging.error("Token env variable is not set")
     verify = True
-    if app.DISABLE_TLS_VALIDATION == "1":
+    if app.IGNORE_CERT == "yes":
         verify = False
     rules_url = "{}{}".format(app.UI_HOST,app.RULES_ENDPOINT)
     logging.debug("Querying {} for rules".format(rules_url))
-    rules = requests.get(url=rules_url,verify=verify)
+    rules = requests.get(url=rules_url,verify=verify,headers={"token":app.TOKEN})
     if not rules.ok:
         logging.warning("Unable to gather rules from {}. Status code: {}. Warning:{}".format(rules_url,
             rules.status_code,rules.text))
@@ -30,15 +32,17 @@ def execute_rules(app, logging):
     if not app.UI_HOST:
         logging.error("UI_HOST env variable is not set")
         return False
+    if not app.TOKEN:
+        logging.error("Token env variable is not set")
     verify = True
-    if app.DISABLE_TLS_VALIDATION == "1":
+    if app.IGNORE_CERT == "yes":
         verify = False
     events_url = "{}{}".format(app.UI_HOST,app.EVENTS_ENDPOINT)
     results_url = "{}{}".format(app.UI_HOST,app.RESULTS_ENDPOINT)
 
     # get events
     logging.debug("Querying {} for events".format(events_url))
-    events = requests.get(url=events_url,verify=verify)
+    events = requests.get(url=events_url,verify=verify,headers={"token":app.TOKEN})
     if not events.ok:
         logging.warning("Unable to gather rules from {}. Status code: {}. Warning:{}".format(events_url,
             events.status_code,events.text))
@@ -54,7 +58,7 @@ def execute_rules(app, logging):
 
     # post results
     logging.debug("Posting results to {}".format(results_url))
-    results = requests.post(url=results_url,json=data,verify=verify)
+    results = requests.post(url=results_url,json=data,verify=verify,headers={"token":app.TOKEN})
     if not results.ok:
         logging.warning("Unable to POST results to {}. Status code: {}. Warning:{}".format(results_url,
             results.status_code,results.text))

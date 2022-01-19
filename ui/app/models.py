@@ -179,6 +179,7 @@ class Event(LogMixin,db.Model, UserMixin):
             "namespace":self.namespace,
             "operation":self.operation,
             "data":self.data,
+            "cluster_uuid":self.cluster.uuid,
             "cluster_name":self.cluster.label,
             "tags":tags,
             "date_added":self.date_added

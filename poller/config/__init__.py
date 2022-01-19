@@ -9,10 +9,11 @@ class Config():
         self.SLEEP_TIME = os.environ.get("SLEEP_TIME",120)
 
         self.UI_HOST = os.environ.get("UI_HOST")
+        self.TOKEN = os.environ.get("TOKEN")
         self.RULES_ENDPOINT = os.environ.get("RULES_ENDPOINT","/api/v1/rules")
         self.EVENTS_ENDPOINT = os.environ.get("EVENTS_ENDPOINT","/api/v1/events")
         self.RESULTS_ENDPOINT = os.environ.get("RESULTS_ENDPOINT","/api/v1/hits")
-        self.DISABLE_TLS_VALIDATION = os.environ.get("DISABLE_TLS_VALIDATION","0")
+        self.IGNORE_CERT = os.environ.get("IGNORE_CERT","no")
 
         self.TASKS = [
             {"name":"Save the rules from the UI","module":"get_rules","enabled":True},
