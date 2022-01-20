@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     environment:
       - VERSION=1.0.0
-      - UI_HOST=https://192.168.1.252
+      - UI_HOST=https://REPLACE_ME
       - IGNORE_CERT=yes
       - SLEEP_TIME=20
       - TOKEN=eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYzMjc5NywiZXhwIjoxNjc0MTY4Nzk3fQ.eyJ0eXBlIjoicG9sbGVyIn0.3yynr0lCM1gcKVDkMSBgqKrOBzaFPr49igfvgPXmONW17PQGG9h0JOhT8czViYVWm_OO-5rZT09D-s1UAZ_M6A
