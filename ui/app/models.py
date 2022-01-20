@@ -418,9 +418,9 @@ class Cluster(LogMixin,db.Model, UserMixin):
             return False
         return cluster
 
-    def generate_auth_token(self, uuid):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        token = s.dumps({"cluster_uuid":uuid})
+    def generate_auth_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'],expires_in=31536000)
+        token = s.dumps({"cluster_uuid":self.uuid})
         return token.decode("utf-8")
 
     @staticmethod
@@ -440,7 +440,7 @@ class Cluster(LogMixin,db.Model, UserMixin):
 
     @staticmethod
     def generate_poller_token():
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'],expires_in=31536000)
         token = s.dumps({"type":"poller"})
         return token.decode("utf-8")
 
@@ -491,7 +491,7 @@ class User(LogMixin,db.Model, UserMixin):
         return data["email"]
 
     @staticmethod
-    def generate_invite_token(email,expiration = 600):
+    def generate_invite_token(email,expiration = 6000):
         s = Serializer(current_app.config['SECRET_KEY'], expires_in = expiration)
         return s.dumps({ 'email': email }).decode('utf-8')
 

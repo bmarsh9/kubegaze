@@ -34,7 +34,7 @@ def check_token_for_poller():
 @login_required
 def get_token_for_cluster(id):
     cluster = Cluster.query.get(id)
-    return jsonify({"token":cluster.generate_auth_token(cluster.uuid)})
+    return jsonify({"token":cluster.generate_auth_token()})
 
 @api.route('/cluster/events', methods=['POST'])
 @cluster_auth
