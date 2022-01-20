@@ -52,7 +52,7 @@ Client Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e143d1dbf57", GitCommit:"b58e143d1dbf57f62d11660e24ddcd7f56e5abf3", GitTreeState:"clean", BuildDate:"2022-01-18T14:53:07Z", GoVersion:"go1.16.13", Compiler:"gc", Platform:"linux/amd64"}
 ```
 
-##### Warning: The installation guide below is for a quick set up in Development. The default certs/secrets used within the files should not be used in production and TLS cert validation should be enabled 
+##### Warning: The installation guide below is for a quick set up in Development. The default certs/secrets used within the files should not be used in production and TLS cert validation should be enabled. The webhook is also (by default) configured to fail open and does not block anything.
 
 ##### Install the server
 1. Clone the repo
