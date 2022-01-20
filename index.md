@@ -3,34 +3,31 @@
 #### Join the discord: https://discord.gg/9unhWAqadg
 #### Get started in 1 minute!
 
-Stream, monitor and alert on events from Kubernetes          |  
-:-------------------------:|
-![](images/kubegaze_2.PNG)  |
-
-#### Watch the 30 second video of custom Form automations
-https://user-images.githubusercontent.com/26391921/145500806-ee2332b6-52d6-43aa-93b7-6530d66dbcf5.mp4
-
 ### Table of Contents
 1. [What is KubeGaze?](#what-is-kubegaze)
 2. [Use Case](#use-case)
 3. [How it Works](#how-it-works)
 4. [Getting Started](#getting-started)
 
-Stream and filter events          |  
+Stream, monitor and alert on events from Kubernetes          |  
 :-------------------------:|
-![](ui/app/static/img/kubegaze_2.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_2.PNG)  |
+
+#### Watch the 30 second video 
+https://user-images.githubusercontent.com/26391921/150392126-aa0bbea7-853f-405d-b275-5d658a8b07c1.mp4
+
 
 High level dashboards          |  
 :-------------------------:|
-![](ui/app/static/img/kubegaze_1.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_1.PNG)  |
 
 Create custom/dynamic alerts          |  
 :-------------------------:|
-![](ui/app/static/img/kubegaze_3.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_3.PNG)  |
 
 View alerts for your k8 events          |  
 :-------------------------:|
-![](ui/app/static/img/kubegaze_4.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_4.PNG)  |
 
 ### What is KubeGaze
 
