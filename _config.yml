@@ -1,2 +1,3 @@
 theme: jekyll-theme-minimal
 title: <img src="images/kubegaze_full.PNG" alt="" class="inline"/>
+description: Security Application for K8. Collect, monitor and alert on events from your Kubernetes clusters
