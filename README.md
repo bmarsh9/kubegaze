@@ -2,6 +2,7 @@
   <img height="120px" src="https://github.com/bmarsh9/kubegaze/blob/18df6b7e0d565c8f41fc4600c229811c56b2f2b7/ui/app/static/img/kubegaze_full.png" alt="Logo"/>
 </p>
 
+#### Join the discord: https://discord.gg/9unhWAqadg
 #### Get started in 1 minute!
 
 ### [Read the documentation to get started](https://bmarsh9.github.io/kubegaze/)
