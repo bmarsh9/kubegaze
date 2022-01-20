@@ -11,7 +11,7 @@
 
 Stream, monitor and alert on events from Kubernetes          |  
 :-------------------------:|
-![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_2.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_2.PNG)  |
 
 #### Watch the 30 second video 
 https://user-images.githubusercontent.com/26391921/150392126-aa0bbea7-853f-405d-b275-5d658a8b07c1.mp4
@@ -19,15 +19,15 @@ https://user-images.githubusercontent.com/26391921/150392126-aa0bbea7-853f-405d-
 
 High level dashboards          |  
 :-------------------------:|
-![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_1.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_1.PNG)  |
 
 Create custom/dynamic alerts          |  
 :-------------------------:|
-![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_3.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_3.PNG)  |
 
 View alerts for your k8 events          |  
 :-------------------------:|
-![](https://github.com/bmarsh9/kubegaze/blob/f4b3aff4b178ea4b7d1b7147bb4ef3b41ba0f87d/images/kubegaze_4.PNG)  |
+![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_4.PNG)  |
 
 ### What is KubeGaze
 
