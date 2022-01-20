@@ -42,6 +42,12 @@ KubeGaze supports an agent/server model. You install the agent (which is just a 
 
 ##### Pre-reqs - Make sure you have a Kubernetes cluster running and docker installed on your local machine. We are going to deploy the webhook and the server portion will be installed locally
 
+```
+root@alf:~/kubegaze# microk8s.kubectl version
+Client Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e143d1dbf57", GitCommit:"b58e143d1dbf57f62d11660e24ddcd7f56e5abf3", GitTreeState:"clean", BuildDate:"2022-01-18T14:55:25Z", GoVersion:"go1.16.13", Compiler:"gc", Platform:"linux/amd64"}
+Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e143d1dbf57", GitCommit:"b58e143d1dbf57f62d11660e24ddcd7f56e5abf3", GitTreeState:"clean", BuildDate:"2022-01-18T14:53:07Z", GoVersion:"go1.16.13", Compiler:"gc", Platform:"linux/amd64"}
+```
+
 ##### Warning: The installation guide below is for a quick set up in Development. The default certs/secrets used within the files should not be used in production and TLS cert validation should be enabled 
 
 ##### Install the server
