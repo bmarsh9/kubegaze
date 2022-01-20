@@ -8,6 +8,7 @@
 2. [Use Case](#use-case)
 3. [How it Works](#how-it-works)
 4. [Getting Started](#getting-started)
+5. [Issues](#issues)
 
 Stream, monitor and alert on events from Kubernetes          |  
 :-------------------------:|
@@ -72,3 +73,9 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 7. Apply the webhook configuration: `kubectl apply -f config/validate.yaml`
 
 If all goes smoothly, you can head back to the `Events` page in the server portion and you should see events flowing in.
+
+### Issues
+
+- Any issues are most likely from the version of Kubernetes you are using. The documentation is going off of `Major:"1", Minor:"22+"` for the server. 
+- Be sure to check the logs of the kubegaze-ui, kubegaze-poller and the webhook pod to see if there are errors being logged
+- Anything outside of that, please log a issue and I'll try to help out
