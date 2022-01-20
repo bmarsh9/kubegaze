@@ -48,7 +48,7 @@ spec:
             - name: SERVER_URL
               value: "https://192.168.1.252/api/v1/cluster/events"
             - name: TOKEN
-              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYyMjg4OCwiZXhwIjoxNjQyNjI2NDg4fQ.eyJjbHVzdGVyX3V1aWQiOiI3YWQwOWU2ZTY1NjI0ZGZmOTM2ZTEwZGQ2YzViYjQyZSJ9.O2p1nhViYsiF2gtlhFtvXTaiE3nt02UD3ErMZFrGGT42u-IlswgKniRUBhqTM0O203VkGni_LEapXsX6LPIF5g"
+              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjYzMDk4NiwiZXhwIjoxNjc0MTY2OTg2fQ.eyJjbHVzdGVyX3V1aWQiOiJiMDQ2NDY3MTY3Yzg0NDZlYWNjODRhNTM2MjBmMGEyZiJ9.He4StwbQSST3q8S6AjoTekyfPMF9A12eseXwxDwVwr8rwwVycAMA_HkDBjYfW85NWujgX21qKRFAtJqlwAcRKg"
             - name: IGNORE_CERT
               value: "yes"
           volumeMounts:
