@@ -3,7 +3,8 @@
 </p>
 
 #### Join the discord: https://discord.gg/9unhWAqadg
-#### Get started in 1 minute!
+#### Watch the 30 second video 
+https://user-images.githubusercontent.com/26391921/150392126-aa0bbea7-853f-405d-b275-5d658a8b07c1.mp4
 
 ### [Read the documentation to get started](https://bmarsh9.github.io/kubegaze/)
 
