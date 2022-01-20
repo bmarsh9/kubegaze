@@ -4,6 +4,8 @@
 
 #### Get started in 1 minute!
 
+### [Read the documentation to get started](https://bmarsh9.github.io/kubegaze/)
+
 ### Table of Contents
 1. [What is KubeGaze?](#what-is-kubegaze)
 2. [Use Case](#use-case)
