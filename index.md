@@ -44,7 +44,7 @@ KubeGaze supports an agent/server model. You install the agent (which is just a 
 
 ### Getting Started
 
-##### Pre-reqs - Make sure you have a Kubernetes cluster running and docker installed on your local machine. We are going to deploy the webhook and the server portion will be installed locally
+##### Pre-reqs - Make sure you have a Kubernetes cluster running and docker installed on your local machine. We are going to deploy the webhook and the server portion will be installed locally. [Here is a quick way to install Kubernetes](https://microk8s.io/docs/getting-started)
 
 ```
 root@alf:~/kubegaze# microk8s.kubectl version
