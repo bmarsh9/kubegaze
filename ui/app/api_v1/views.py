@@ -36,6 +36,22 @@ def get_token_for_cluster(id):
     cluster = Cluster.query.get(id)
     return jsonify({"token":cluster.generate_auth_token()})
 
+@api.route('/cluster/objects', methods=['POST'])
+@cluster_auth
+def post_objects_from_cluster(cluster=None):
+    if current_app.config["DISABLE_CLUSTER_AUTH"] == "yes":
+        cluster = Cluster.query.get(request.args.get("cluster_id",0))
+        if not cluster:
+            return jsonify({"message":"cluster not found. cluster authentication is disabled"}),404
+    data = request.get_json()
+    category = data.get("category")
+    if not category:
+        return jsonify({"message":"missing category"}),400
+    for result in data.get("results",[]):
+        print(result)
+        #Object(category=category,data=result)
+    return jsonify({"message":"ok"})
+
 @api.route('/cluster/events', methods=['POST'])
 @cluster_auth
 def post_events_from_cluster(cluster=None):

@@ -46,9 +46,9 @@ spec:
             - "app:app"
           env:
             - name: SERVER_URL
-              value: "https://REPLACE_ME/api/v1/cluster/events"
+              value: "https://192.168.1.252/api/v1/cluster/events"
             - name: TOKEN
-              value: "REPLACE ME"
+              value: "eyJhbGciOiJIUzUxMiIsImlhdCI6MTY0MjY0MTYwMiwiZXhwIjoxNjc0MTc3NjAyfQ.eyJjbHVzdGVyX3V1aWQiOiI3YjljOTM1YTZhNmE0OWFkYjA5NTJmNzQyZGY1ZDhmOCJ9.gHGKjEDmEmbaWpbSdYGzG53PZwgqSQFFv9WEjeBHOkZxsBm0LDL3C-Cqvn58_Zlf8wW1frbhpoM1PzZk3QWcQw"
             - name: IGNORE_CERT
               value: "yes"
           volumeMounts:

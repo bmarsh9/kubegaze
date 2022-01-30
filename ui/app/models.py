@@ -149,6 +149,21 @@ class Rule(LogMixin,db.Model, UserMixin):
         template+=row_template.format("remediation",self.remediation)
         return shell_template.format(template)
 
+class Object(LogMixin,db.Model):
+    __tablename__ = 'objects'
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String())
+    kind = db.Column(db.String(),default="unknown")
+    category = db.Column(db.String())
+    apiversion = db.Column(db.String())
+    name = db.Column(db.String(),default="unknown")
+    namespace = db.Column(db.String(),default="unknown")
+    data = db.Column(db.JSON(),default={})
+    events = db.relationship('Event', backref='object', lazy='dynamic')
+    cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
 class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
@@ -161,6 +176,7 @@ class Event(LogMixin,db.Model, UserMixin):
     data = db.Column(db.JSON(),default={})
     tags = db.relationship('Tag', secondary='assoc_tags', lazy='dynamic')
     seen = db.Column(db.Boolean, default=False) # ran against rules
+    object_id = db.Column(db.Integer, db.ForeignKey('objects.id'))
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     alerts = db.relationship('Alert', backref='event', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
