@@ -2,7 +2,11 @@
   <img height="120px" src="https://github.com/bmarsh9/kubegaze/blob/18df6b7e0d565c8f41fc4600c229811c56b2f2b7/ui/app/static/img/kubegaze_full.png" alt="Logo"/>
 </p>
 
-#### Get started in 1 minute!
+#### Join the discord: https://discord.gg/9unhWAqadg
+#### Watch the 30 second video 
+https://user-images.githubusercontent.com/26391921/150392126-aa0bbea7-853f-405d-b275-5d658a8b07c1.mp4
+
+### [Read the documentation to get started](https://bmarsh9.github.io/kubegaze/)
 
 ### Table of Contents
 1. [What is KubeGaze?](#what-is-kubegaze)
