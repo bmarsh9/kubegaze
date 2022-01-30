@@ -1,0 +1,283 @@
+{% extends "layouts/condensed.html" %}
+{%block head%}
+  <script src="https://gw.alipayobjects.com/os/lib/antv/g6/3.7.1/dist/g6.min.js"></script>
+  <style>
+#graph-container {
+  height: 90vh;
+  overflow: hidden;
+  background: repeating-linear-gradient( 45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px);
+  border: 1px solid #e5e5e5;
+  border-radius: 0px;
+  background-image: url("/static/img/tile.png");
+  background-repeat: repeat;
+  background-size: 30px 30px;
+}
+  </style>
+{%endblock%}
+{%block header%}{%endblock%}
+{%block contentHeader%}{%endblock%}
+
+{% block container %}
+  <div class="container-fluid g-0">
+    <div class="row g-0">
+      <div class="col-3">
+        <div class="card h-100">
+          <div class="card-header">
+            <h3 class="card-title">Graph</h3>
+          </div>
+          <div class="card-body">
+          body
+          </div>
+          <div class="card-footer">
+          footer
+          </div>
+        </div>        
+      </div>
+      <div id="graph-container" class="col-9 border-dark">
+      </div>
+    </div>
+  </div>
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEnd" aria-labelledby="offcanvasEndLabel" style="visibility: visible;" aria-modal="true" role="dialog">
+              <div class="offcanvas-header">
+                <h2 class="offcanvas-title" id="offcanvasEndLabel">End offcanvas</h2>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+              </div>
+              <div class="offcanvas-body">
+                <div>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda ea est, eum exercitationem fugiat illum itaque laboriosam magni necessitatibus, nemo nisi numquam quae reiciendis repellat sit soluta unde. Aut!
+                </div>
+                <div class="mt-3">
+                  <button class="btn" type="button" data-bs-dismiss="offcanvas">
+                    Close offcanvas
+                  </button>
+                </div>
+              </div>
+            </div>
+{%endblock%}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {      
+
+//haaaaaaa
+const tooltip = new G6.Tooltip({
+  offsetX: 300,
+  offsetY: 75,
+  getContent(e) {
+    const outDiv = document.createElement('div');
+    outDiv.style.width = '180px';
+    outDiv.innerHTML = `${e.item.getModel().html}`
+    return outDiv
+  },
+  itemTypes: ['node']
+});
+
+
+// The symbols for the marker inside the combo
+const collapseIcon = (x, y, r) => {
+  return [
+    ['M', x - r, y],
+    ['a', r, r, 0, 1, 0, r * 2, 0],
+    ['a', r, r, 0, 1, 0, -r * 2, 0],
+    ['M', x - r + 4, y],
+    ['L', x - r + 2 * r - 4, y],
+  ];
+};
+const expandIcon = (x, y, r) => {
+  return [
+    ['M', x - r, y],
+    ['a', r, r, 0, 1, 0, r * 2, 0],
+    ['a', r, r, 0, 1, 0, -r * 2, 0],
+    ['M', x - r + 4, y],
+    ['L', x - r + 2 * r - 4, y],
+    ['M', x - r + r, y - r + 4],
+    ['L', x, y + r - 4],
+  ];
+};
+
+G6.registerCombo(
+  'cRect',
+  {
+    drawShape: function drawShape(cfg, group) {
+      const self = this;
+      // Get the padding from the configuration
+      cfg.padding = cfg.padding || [50, 20, 20, 20];
+      // Get the shape's style, where the style.width and style.height correspond to the width and height in the figure of Illustration of Built-in Rect Combo
+      const style = self.getShapeStyle(cfg);
+      // Add a rect shape as the keyShape which is the same as the extended rect Combo
+      const rect = group.addShape('rect', {
+        attrs: {
+          ...style,
+          x: -style.width / 2 - (cfg.padding[3] - cfg.padding[1]) / 2,
+          y: -style.height / 2 - (cfg.padding[0] - cfg.padding[2]) / 2,
+          width: style.width,
+          height: style.height,
+        },
+
+        draggable: false,
+        name: 'combo-keyShape',
+      });
+      // Add the circle on the right
+      group.addShape('marker', {
+        attrs: {
+          ...style,
+          fill: '#fff',
+          opacity: 1,
+          // cfg.style.width and cfg.style.heigth correspond to the innerWidth and innerHeight in the figure of Illustration of Built-in Rect Combo
+          x: cfg.style.width / 2 + cfg.padding[1],
+          y: (cfg.padding[2] - cfg.padding[0]) / 2,
+          r: 10,
+          symbol: collapseIcon,
+        },
+        draggable: false,
+        name: 'combo-marker-shape',
+      });
+      return rect;
+    },
+    // Define the updating logic of the right circle
+    afterUpdate: function afterUpdate(cfg, combo) {
+      const group = combo.get('group');
+      // Find the circle shape in the graphics group of the Combo by name
+      const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
+      // Update the position of the right circle
+      marker.attr({
+        // cfg.style.width and cfg.style.heigth correspond to the innerWidth and innerHeight in the figure of Illustration of Built-in Rect Combo
+        x: cfg.style.width / 2 + cfg.padding[1],
+        y: (cfg.padding[2] - cfg.padding[0]) / 2,
+        // The property 'collapsed' in the combo data represents the collapsing state of the Combo
+        // Update the symbol according to 'collapsed'
+        symbol: cfg.collapsed ? expandIcon : collapseIcon,
+      });
+    },
+  },
+  'rect',
+);
+const label = {           // The configurations for the label
+    positions: 'center',// The relative position of the label
+    style: {            // The style properties of the label
+      fontSize: 12,     // The font size of the label
+      fill:"#ffffff"
+    }
+}
+const style = {
+  cursor: 'pointer'
+}
+//haaaaaaaa
+const data = {
+  nodes: [
+    { id: 'node1', kind:"container",x: 250, y: 200, comboId: 'combo1',labelCfg:label,style:style,draggable:false,html:"<h4>hey</h4>"},
+    { id: 'node2', kind:"container",x: 300, y: 200, comboId: 'combo1',labelCfg:label,style:style},
+    { id: 'node3', kind:"container",x: 100, y: 200, comboId: 'combo3',labelCfg:label,style:style},
+  ],
+  combos: [
+    { id: 'combo1', kind:"pod",label: 'Pod', parentId: 'combo2',labelCfg:label},
+    { id: 'combo2', kind:"namespace",label: 'Namespace',labelCfg:label },
+    { id: 'combo3', kind:"pod",label: 'Pod', collapsed: true,labelCfg:label },
+  ],
+  edges: [
+    {
+      source: 'combo1',
+      target: 'combo3',
+    },
+  ]
+};
+
+const descriptionDiv = document.createElement('div');
+
+const container = document.getElementById('graph-container');
+container.appendChild(descriptionDiv);
+
+const width = container.scrollWidth;
+const height = (container.scrollHeight || 500) - 20;
+const graph = new G6.Graph({
+  container: 'graph-container',
+  width,
+  height,
+  // Set groupByTypes to false to get rendering result with reasonable visual zIndex for combos
+  plugins: [tooltip],
+  groupByTypes: false,
+  defaultCombo: {
+    // The type of the combos. You can also assign type in the data of combos
+    type: 'cRect',
+    style: {
+      radius: [6, 6, 6, 6],
+      fill: '#1f2936',
+      stroke: '#656d77',
+      cursor: 'grab'
+    }
+    // ... Other global configurations for combos
+  },
+  modes: {
+    default: ['drag-combo','drag-canvas'],
+  },
+  nodeStateStyles: {
+    hover: {
+      lineWidth: 2,
+      stroke: '#1890ff',
+      fill: '#e6f7ff',
+    },
+  },
+});
+graph.data(data);
+graph.render();
+
+
+graph.on('node:mouseenter', (evt) => {
+  const { item } = evt;
+  graph.setItemState(item, 'active', true);
+});
+
+graph.on('node:mouseleave', (evt) => {
+  const { item } = evt;
+  graph.setItemState(item, 'active', false);
+});
+
+graph.on('combo:click', (evt) => {
+  console.log(evt.item.getModel().id)
+})
+
+graph.on('node:click', (evt) => {
+  console.log(evt.item.getModel().id)
+  console.log(evt.item.getModel().kind)
+//haaaaa
+  var myOffcanvas = document.getElementById("offcanvasEnd")
+  var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
+  bsOffcanvas.toggle()
+  $("#offcanvasEndLabel").html(evt.item.getModel().id)
+  const { item } = evt;
+  graph.setItemState(item, 'selected', true);
+});
+
+graph.on('canvas:click', (evt) => {
+  console.log("deselecting")
+  var myOffcanvas = document.getElementById("offcanvasEnd")
+  var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
+  bsOffcanvas.toggle()
+
+  graph.getNodes().forEach((node) => {
+    graph.clearItemStates(node);
+  });
+});
+
+
+// collapse/expand when click the marker
+graph.on('combo:click', (e) => {
+  if (e.target.get('name') === 'combo-marker-shape') {
+    // graph.collapseExpandCombo(e.item.getModel().id);
+    graph.collapseExpandCombo(e.item);
+    if (graph.get('layout')) graph.layout();
+    else graph.refreshPositions();
+  }
+});
+
+if (typeof window !== 'undefined')
+  window.onresize = () => {
+    if (!graph || graph.get('destroyed')) return;
+    if (!container || !container.scrollWidth || !container.scrollHeight) return;
+    graph.changeSize(container.scrollWidth, container.scrollHeight - 20);
+};
+    });
+  </script>
+{%endblock%}

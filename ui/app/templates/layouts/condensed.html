@@ -20,7 +20,7 @@
     </style>
     <!-- CSS files -->
     <link href="{{ url_for('static', filename='css/margins.css') }}" rel="stylesheet"/>
-    <link href="{{ url_for('static', filename='css/tabler.min.css') }}" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/tabler.min2.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/tabler-flags.min.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/tabler-payments.min.css') }}" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/tabler-vendors.min.css') }}" rel="stylesheet"/>
@@ -216,7 +216,8 @@
   </body>
   {%endblock%}
   <!-- Tabler Core -->
-  <script src="{{ url_for('static', filename='js/tabler.min.js') }}"></script>
+<!--  <script src="{{ url_for('static', filename='js/tabler.min.js') }}"></script>-->
+  <script src="https://preview.tabler.io/dist/js/tabler.min.js?1643465883"></script>
   <script>
   {% for category,message in get_flashed_messages(with_categories=True)[:3] %}
     {% if category == "message" %}
