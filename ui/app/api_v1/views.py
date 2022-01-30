@@ -142,3 +142,52 @@ def post_hits():
                         rule_id=alert["rule_id"],cluster_id=event.cluster_id))
     db.session.commit()
     return jsonify({"message":"ok"})
+
+@api.route('/map', methods=['GET'])
+@login_required
+def get_map():
+    label = {
+        "positions": 'center',
+        "style": {
+            "fontSize": 12,
+            "fill": "#F3F6F9",
+        },
+    }
+    node_style = {
+        "cursor": 'pointer',
+        #"fill": "#F64E60",
+        "fill": "#F3F6F9",
+        "stroke": "#1b2434"
+    }
+    donut_prop = {
+        "high": 5,
+        "moderate": 7,
+        "low": 9
+    }
+    donut_color = {
+        "high": '#d63939',
+        "moderate": '#f76707',
+        "low": '#2fb344'
+    }
+    icon = {
+        "show": True,
+        "img": "/static/img/urgent.png",
+    }
+
+    data = {
+        "nodes":[],
+        "combos":[],
+        "edges": [{
+            "source": 'combo1',
+            "target": 'combo3',
+        },]
+    }
+    combo_label = {"style":{"fill":"#fff","fontSize":12}}
+
+    for enum,node in enumerate(range(0,3)):
+        icon_url = "/static/img/flag-2.svg"
+        data["nodes"].append({"id":"node{}".format(enum),"type":"donut","size":40,"kind":"container","x":250,"y":200,"comboId":"combo1","style":node_style,"draggable":False,"html":"<h4>hey</h4>","icon":icon,"donutAttrs": donut_prop,"donutColorMap": donut_color})
+    for enum,node in enumerate(range(0,3)):
+        data["combos"].append({"id":"combo{}".format(enum),"label":"combo{}".format(enum),"kind":"pod","comboId":"combo1","draggable":False,"collapsed": True,"labelCfg":combo_label})
+
+    return jsonify(data)
