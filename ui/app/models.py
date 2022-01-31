@@ -152,13 +152,13 @@ class Rule(LogMixin,db.Model, UserMixin):
 class Object(LogMixin,db.Model):
     __tablename__ = 'objects'
     id = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.String())
+    uid = db.Column(db.String(),unique=True)
     kind = db.Column(db.String(),default="unknown")
-    category = db.Column(db.String())
     apiversion = db.Column(db.String())
     name = db.Column(db.String(),default="unknown")
     namespace = db.Column(db.String(),default="unknown")
-    data = db.Column(db.JSON(),default={})
+    _metadata = db.Column(db.JSON(),default={})
+    _spec = db.Column(db.JSON(),default={})
     events = db.relationship('Event', backref='object', lazy='dynamic')
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
@@ -394,7 +394,9 @@ class Cluster(LogMixin,db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(),nullable=False)
     label = db.Column(db.String(),nullable=False)
+    objects = db.relationship('Object', backref='cluster', lazy='dynamic')
     events = db.relationship('Event', backref='cluster', lazy='dynamic')
+    last_indexed = db.Column(db.DateTime)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -459,6 +461,64 @@ class Cluster(LogMixin,db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'],expires_in=31536000)
         token = s.dumps({"type":"poller"})
         return token.decode("utf-8")
+
+    def to_graph_format(self):
+        label = {
+            "positions": 'center',
+            "style": {
+                "fontSize": 12,
+                "fill": "#F3F6F9",
+            },
+        }
+        node_style = {
+            "cursor": 'pointer',
+            #"fill": "#F64E60",
+            "fill": "#F3F6F9",
+            "stroke": "#1b2434"
+        }
+        donut_prop = {
+            "high": 5,
+            "moderate": 7,
+            "low": 9
+        }
+        donut_color = {
+            "high": '#d63939',
+            "moderate": '#f76707',
+            "low": '#2fb344'
+        }
+        icon = {
+            "show": True,
+            "img": "/static/img/urgent.png",
+        }
+        combo_label = {"style":{"fill":"#fff","fontSize":12}}
+        data = {
+            "nodes":[],
+            "combos":[],
+#            "edges": [{
+#                "source": 'combo1',
+#                "target": 'combo3',
+#            },]
+        }
+#haaaaaaa
+        data["combos"].append({"id":self.uuid,"label":self.label,"kind":"cluster","labelCfg":combo_label})
+
+        #namespace
+        for namespace in self.objects.filter(Object.kind == "namespace").all():
+            data["combos"].append({"id":namespace.uid,
+                "label":namespace.name,"kind":"namespace",
+                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid})
+            #pod
+            for pod in self.objects.filter(Object.namespace == namespace.name).filter(Object.kind == "pod").all():
+                data["combos"].append({"id":pod.uid,
+                    "label":"{}...".format(pod.name[:8]),"kind":"pod","parentId":namespace.uid,
+                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle"})
+                icon_url = "/static/img/flag-2.svg"
+                #container
+                for container in pod._spec["containers"]:
+                    data["nodes"].append({"id":"{}-{}".format(pod.uid,container["name"]),"type":"donut",
+                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,
+                        "draggable":False,"html":"<h4>{}</h4>".format(container["name"]),"icon":icon,"donutAttrs": donut_prop,"donutColorMap": donut_color})
+        return data
 
 class User(LogMixin,db.Model, UserMixin):
     __tablename__ = 'users'
