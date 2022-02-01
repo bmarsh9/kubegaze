@@ -30,9 +30,13 @@ View alerts for your k8 events          |
 :-------------------------:|
 ![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_4.PNG)  |
 
+View the graph for your k8 cluster          |  
+:-------------------------:|
+![](https://github.com/bmarsh9/kubegaze/raw/gh-pages/images/kubegaze_graph.PNG)  |
+
 ### What is KubeGaze
 
-KubeGaze is a security monitoring tool for Kubernetes clusters. At a high level, it consumes events from your cluster and allows you to write rules/alerts that trigger on specific events. For example, if someone tries to deploy a container running as root or pulling a image from a unauthorized registry, you can trigger on that. The beauty of KubeGaze is that the rule engine is just very basic Python code. No need to learn another language. Also, KubeGaze has an agent/server model so it can support any number of clusters.
+KubeGaze is a security monitoring tool for Kubernetes clusters. At a high level, it consumes events from your cluster and allows you to write rules/alerts that trigger on specific events. For example, if someone tries to deploy a container running as root or pulling a image from a unauthorized registry, you can trigger on that. The beauty of KubeGaze is that the rule engine is just very basic Python code. No need to learn another language. Also, KubeGaze has an agent/server model so it can support any number of clusters. Kubegaze also allows you to view a visual graph of your Kubernetes clusters.
 
 ### Use Case
 
@@ -40,11 +44,11 @@ The most popular use case is likely a security monitoring (CSIRT) team that want
 
 ### How it Works
 
-KubeGaze supports an agent/server model. You install the agent (which is just a K8 Admission Webhook) in your cluster and the server portion can be deployed anywhere. Once the webhook is installed, it forwards events from the Kubernetes API server to the server portion. This allows you to deploy it anywhere and consolidate events from all of your clusters.
+KubeGaze supports an agent/server model. You install the agent (which is just a K8 Admission Webhook) in your cluster and the server portion can be deployed anywhere. Once the webhook is installed, it forwards events from the Kubernetes API server to the server portion. This allows you to deploy it anywhere and consolidate events from all of your clusters. You can optionally install a third component called the "indexer" that maps out a visual graph of your cluster. This container just runs in a pod in each K8 cluster, queries the objects currently deployed and sends the data to the server. 
 
 ### Getting Started
 
-##### Pre-reqs - Make sure you have a Kubernetes cluster running and docker installed on your local machine. We are going to deploy the webhook and the server portion will be installed locally. [Here is a quick way to install Kubernetes](https://microk8s.io/docs/getting-started)
+##### Pre-reqs - Make sure you have a Kubernetes cluster running and docker installed on your local machine. We are going to deploy the webhook and indexer in the cluster. The server portion will be installed locally. [Here is a quick way to install Kubernetes](https://microk8s.io/docs/getting-started)
 
 ```
 root@alf:~/kubegaze# microk8s.kubectl version
@@ -63,7 +67,7 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 6. At this point, you should be logged into the server component
 7. Navigate to the `Clusters` tab and click the first cluster's `edit` button. Click `Generate Token` and then the button `Generate`. The token should populate, save this for the agent below in the following steps.
 
-##### Install the agent (webhook container)
+##### Install the webhook (container)
 1. Clone the repo (if you havent already)
 2. Navigate to the `kubegaze` folder (top level directory)
 3. Update the `SERVER_URL` value in the file `config/deployment.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
@@ -71,6 +75,13 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 5. (Back in top level directory) Create secret: `kubectl --namespace=webhook create secret tls webhook-certs --cert=keys/server.crt --key=keys/server.key`
 6. Apply the webhook deployment (check logs of the deployed pod for errors): `kubectl apply -f config/deployment.yaml`
 7. Apply the webhook configuration: `kubectl apply -f config/validate.yaml`
+
+##### Install the indexer (container)
+1. Clone the repo (if you havent already)
+2. Navigate to the `kubegaze` folder (top level directory)
+3. Update the `UI_HOST` value in the file `config/indexer-pod.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
+4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L51). The token is generated in the `Install the server` section (step 7 above)
+5. Apply the webhook configuration: `kubectl apply -f config/indexer-pod.yaml`
 
 If all goes smoothly, you can head back to the `Events` page in the server portion and you should see events flowing in.
 
