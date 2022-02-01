@@ -70,7 +70,7 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 ##### Install the webhook (container)
 1. Clone the repo (if you havent already)
 2. Navigate to the `kubegaze` folder (top level directory)
-3. Update the `SERVER_URL` value in the file `config/deployment.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
+3. Update the `SERVER_URL` value in the file `config/deployment.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server UI address
 4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L51). The token is generated in the `Install the server` section (step 7 above)
 5. (Back in top level directory) Create secret: `kubectl --namespace=webhook create secret tls webhook-certs --cert=keys/server.crt --key=keys/server.key`
 6. Apply the webhook deployment (check logs of the deployed pod for errors): `kubectl apply -f config/deployment.yaml`
@@ -79,7 +79,7 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 ##### Install the indexer (container)
 1. Clone the repo (if you havent already)
 2. Navigate to the `kubegaze` folder (top level directory)
-3. Update the `UI_HOST` value in the file `config/indexer-pod.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/indexer-pod.yaml#L15) to your server address
+3. Update the `UI_HOST` value in the file `config/indexer-pod.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/indexer-pod.yaml#L15) to your server UI address
 4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/indexer-pod.yaml#L17). The token is generated in the `Install the server` section (step 7 above)
 5. Apply the webhook configuration: `kubectl apply -f config/indexer-pod.yaml`
 
