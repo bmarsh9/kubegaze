@@ -164,8 +164,29 @@ class Object(LogMixin,db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    @staticmethod
+    def get_kinds():
+        objects = Object.query.with_entities(Object.kind).distinct().all()
+        return [x[0] for x in objects]
+
+    @staticmethod
+    def get_objects_from_api_query(kinds=[],clusters=[]):
+        data = []
+        _query = Object.query
+        if clusters:
+            _query = _query.filter(Object.cluster_id.in_(clusters))
+        if kinds:
+            _query = _query.filter(func.lower(Object.kind).in_(kinds))
+        for record in _query.all():
+            spec_link = ""
+            if record._spec:
+                spec_link = "<a href='#' data-attribute='{}' class='spawnModal btn btn-dark'>Spec</a>".format(json.dumps(record._spec))
+            data.append([record.name,record.kind,record.namespace,
+                record.cluster.label,record.date_added,
+                spec_link])
+        return data
+
     def summary_html(self,container_name=None):
-#haaaaaaaaa
         template = """
           <div class="card">
             <div class="card-header">
@@ -460,6 +481,14 @@ class Cluster(LogMixin,db.Model, UserMixin):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    def has_recent_stream(self):
+        now = arrow.utcnow()
+        return Event.query.filter(Event.cluster_id == self.id).filter(or_(Event.date_added > now.shift(hours=-1).datetime,Event.date_updated > now.shift(hours=-1).datetime)).first()
+
+    def has_recent_index(self):
+        now = arrow.utcnow()
+        return Object.query.filter(Object.cluster_id == self.id).filter(or_(Object.date_added > now.shift(hours=-1).datetime,Object.date_updated > now.shift(hours=-1).datetime)).first()
+
     def get_rules(self):
         rules = []
         for assoc in AssocRule.query.filter(AssocRule.cluster_id == self.id).all():
@@ -532,7 +561,6 @@ class Cluster(LogMixin,db.Model, UserMixin):
         }
         node_style = {
             "cursor": 'pointer',
-            "fill": "#F3F6F9",
             "stroke": "#1b2434"
         }
         combo_label = {"style":
@@ -550,25 +578,26 @@ class Cluster(LogMixin,db.Model, UserMixin):
               },
             ]
         }
-#haaaaaaa
         #cluster
         data["combos"].append({"id":self.uuid,"label":self.label,"kind":"cluster","labelCfg":combo_label})
         #namespace
         for namespace in self.objects.filter(Object.kind == "namespace").all():
             data["combos"].append({"id":namespace.uid,
                 "label":namespace.name,"kind":"namespace",
-                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid,"panel_html":namespace.summary_html()})
+                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid,
+                "panel_html":namespace.summary_html()})
             #pod
             for pod in self.objects.filter(Object.namespace == namespace.name).filter(Object.kind == "pod").all():
                 data["combos"].append({"id":pod.uid,
                     "label":"{}...".format(pod.name[:8]),"kind":"pod","parentId":namespace.uid,
-                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle","panel_html":pod.summary_html()})
-                icon_url = "/static/img/flag-2.svg"
+                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle",
+                    "panel_html":pod.summary_html()})
                 #container
                 for container in pod._spec["containers"]:
-                    data["nodes"].append({"id":"{}-{}".format(pod.uid,container["name"]),"type":"donut",
-                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,"panel_html":pod.summary_html(container_name=container["name"]),
-                        "draggable":False,"html":"<h4>{}</h4>".format(container["name"]),"label":50})
+                    data["nodes"].append({"id":"{}-{}".format(pod.uid,container["name"]),
+                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,
+                        "panel_html":pod.summary_html(container_name=container["name"]),"draggable":False,
+                        "html":"<h4>Name: {}<br>Namespace:{}<br>Type: Container</h4>".format(container["name"],pod.namespace)})
         return data
 
 class User(LogMixin,db.Model, UserMixin):

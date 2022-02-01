@@ -27,11 +27,11 @@
   <div class="container-fluid g-0">
 
     <div class="row mr-4 ml-4 border-bottom">
-<div class="page-header">
+<div class="page-header mt-0 mb-2">
   <div class="row align-items-center">
     <div class="col">
       <div class="page-pretitle">
-        home
+        <a href="{{url_for("main.clusters")}}" class="text-white">home</a>
       </div>
       <h2 class="page-title">
         Cluster Graph - <span class="badge badge-outline text-blue ml-2">{{cluster.label}}</span>
@@ -324,11 +324,13 @@ G6.registerEdge(
 
             graph.on('combo:click', (evt) => {
                 console.log(evt.item.getModel().id)
+                /*
                 var myOffcanvas = document.getElementById("offcanvasEnd")
                 var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
                 bsOffcanvas.toggle()
                 $("#offcanvasEndLabel").html(evt.item.getModel().id)
                 $("#end-body").html(evt.item.getModel().panel_html)
+                */
             })
 
             graph.on('node:click', (evt) => {
@@ -337,7 +339,6 @@ G6.registerEdge(
                 var myOffcanvas = document.getElementById("offcanvasEnd")
                 var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
                 bsOffcanvas.toggle()
-//haaaaaaaa
                 $("#offcanvasEndLabel").html(evt.item.getModel().id)
                 $("#end-body").html(evt.item.getModel().panel_html)
 

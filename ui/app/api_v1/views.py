@@ -173,3 +173,13 @@ def post_hits():
 def get_graph(id):
     cluster = Cluster.query.get(id)
     return jsonify(cluster.to_graph_format())
+
+@api.route("/objects", methods=["GET"])
+@login_required
+def get_objects():
+#haaaaaa
+    objects = Object.get_objects_from_api_query(
+        clusters=request.args.getlist('clusters'),
+        kinds=request.args.getlist('kinds'),
+    )
+    return jsonify({"data":objects})

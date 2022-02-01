@@ -12,6 +12,22 @@ from datetime import datetime, timedelta
 def home():
     return render_template("dashboard.html")
 
+@main.route('/objects', methods=['GET'])
+@login_required
+def objects():
+    kinds = request.args.getlist('kinds')
+    clusters = request.args.getlist('clusters')
+    filters = {
+        "clusters":clusters,
+        "kinds":kinds,
+    }
+    cluster_list = Cluster.query.all()
+    kind_list = Object.get_kinds()
+    query_string = request.query_string.decode("utf-8")
+    return render_template("objects.html",filters=filters,
+        kind_list=kind_list,query_string=query_string,
+        cluster_list=cluster_list)
+
 @main.route('/clusters', methods=['GET'])
 @login_required
 def clusters():

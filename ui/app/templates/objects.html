@@ -1,0 +1,154 @@
+{% extends "layouts/condensed.html" %}
+
+{% block before_head %}
+  {{ super() }}
+  {% import "helpers/src_macros.html" as macro %}
+  {{ macro.filehelper(datatables=True,old_select=True,datepicker=True,uri=True) }}
+<style>
+ul.chosen-choices {
+  background-color:transparent !important;
+}
+.scroll {
+    max-height: 500px;
+    overflow-y: scroll;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
+{% endblock %}
+
+{%block contentHeader_pretitle%}objects{%endblock%}
+{%block contentHeader_title%}Objects{%endblock%}
+
+{%block content%}
+  <div class="row row-cards col">
+    <div class="col-12">
+      <div class="alert alert-warning text-white bg-transparent" role="alert">
+        <small>Search and filter for objects that were discovered in your clusters</small>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="mb-2">
+        <div class="subheader mb-2">Clusters (or)</div>
+        <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+        <select size="4" autocomplete="off" multiple="multiple" name="clusters[]" class="form-control subheader cursor-pointer {% if filters["clusters"]%}is-valid{%endif%}" id="filter-clusters" data-placeholder="clusters">
+        {% for cluster in cluster_list %}
+          {%if cluster.id|string in filters["clusters"] %}
+          <option value="{{cluster.id}}" selected>{{cluster.label|capitalize}}</option>
+          {%else%}
+          <option value="{{cluster.id}}">{{cluster.label|capitalize}}</option>
+          {%endif%}
+        {% endfor %}
+        </select>
+      </div>
+      <div class="mb-4">
+        <div class="subheader mb-2">Kind (or)</div>
+        <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+        <select size="4" autocomplete="off" multiple="multiple" name="kinds[]" class="form-control subheader cursor-pointer {% if filters["kinds"]%}is-valid{%endif%}" id="filter-kinds" data-placeholder="kinds">
+        {% for kind in kind_list %}
+          {%if kind in filters["kinds"] %}
+          <option value="{{kind|lower}}" selected>{{kind|capitalize}}</option>
+          {%else%}
+          <option value="{{kind|lower}}">{{kind|capitalize}}</option>
+          {%endif%}
+        {% endfor %}
+        </select>
+      </div>
+      <div class="mt-2">
+        <div class="btn-list">
+          <span class="d-none d-sm-inline">
+          <a id="deleteFilter" href="#" class="btn btn-outline-danger btn-icon" aria-label="Button"><i class="ti ti-trash mr-1"></i>Trash</a>
+          </span>
+          <a id="postFilter" href="#" class="btn btn-outline-cyan btn-icon" aria-label="Button"><i class="ti ti-filter mr-1"></i>Filter</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-9">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Objects</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-bordered" id="example" style="width:100%">
+                <thead class="bg-white-lt">
+                  <tr>
+                    <th class="text-white">Name</th>
+                    <th class="text-white">Kind</th>
+                    <th class="text-white">Namespace</th>
+                    <th class="text-white">Cluster</th>
+                    <th class="text-white">Date Added</th>
+                    <th class="text-white">Spec</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+          </div>
+        </div>
+    </div>
+  </div>
+
+<div class="modal modal-blur fade" id="specModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Object</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <pre id="modalBody" class="modal-body text-light"></pre>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%endblock%}
+
+{% block extrajs %}
+  <script>
+    $(document).ready(function() {      
+      $('#example').DataTable( {
+        "ajax": "{{url_for("api.get_objects")}}?{{query_string|safe}}",
+        "order": [[ 0, "desc" ]]
+      } );
+      $('#filter-kinds').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
+      $('#filter-clusters').chosen({width: '100%', skip_no_results: true,max_selected_options: 5});
+
+      $(document).on("click","#postFilter",function() {
+        var dict = {};
+        var kinds = $("#filter-kinds").val()
+        var clusters = $("#filter-clusters").val()
+
+        if (clusters) {
+            dict.clusters = clusters;
+        };
+        if (kinds) {
+            dict.kinds = kinds;
+        };
+        var url = new URI(document.location.href.toString());
+        url.query(dict)
+        window.location.href = url;
+      });
+      $(document).on("click","#deleteFilter",function() {
+        window.location.href = document.location.href.split('?')[0];
+      });
+      $(document).on("click",".spawnModal",function() {
+        var value = $(this).attr('data-attribute');
+//haaaaaaa
+        $('#specModal').modal('show');
+        $('#modalBody').html(value)
+      });
+    });
+  </script>
+{%endblock%}
