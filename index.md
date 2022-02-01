@@ -79,8 +79,8 @@ Server Version: version.Info{Major:"1", Minor:"22+", GitVersion:"v1.22.5-3+b58e1
 ##### Install the indexer (container)
 1. Clone the repo (if you havent already)
 2. Navigate to the `kubegaze` folder (top level directory)
-3. Update the `UI_HOST` value in the file `config/indexer-pod.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L49) to your server address
-4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/deployment.yaml#L51). The token is generated in the `Install the server` section (step 7 above)
+3. Update the `UI_HOST` value in the file `config/indexer-pod.yaml` [here](https://github.com/bmarsh9/kubegaze/blob/main/config/indexer-pod.yaml#L15) to your server address
+4. Update the `TOKEN` value right below it [here](https://github.com/bmarsh9/kubegaze/blob/main/config/indexer-pod.yaml#L17). The token is generated in the `Install the server` section (step 7 above)
 5. Apply the webhook configuration: `kubectl apply -f config/indexer-pod.yaml`
 
 If all goes smoothly, you can head back to the `Events` page in the server portion and you should see events flowing in.
