@@ -12,9 +12,9 @@ spec:
     imagePullPolicy: Always
     env:
       - name: UI_HOST
-        value: "http://192.168.1.252:5000"
+        value: "https://REPLACE_ME"
       - name: TOKEN
-        value: ""
+        value: "REPLACE ME"
       - name: IGNORE_CERT
         value: "yes"
       - name: SLEEP_TIME
