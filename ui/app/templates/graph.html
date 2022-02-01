@@ -12,6 +12,12 @@
   background-repeat: repeat;
   background-size: 30px 30px;
 }
+.offcanvas-end {
+  width: 50%
+}
+.offcanvas-start {
+  width: 50%
+}
   </style>
 {%endblock%}
 {%block header%}{%endblock%}
@@ -28,7 +34,7 @@
         home
       </div>
       <h2 class="page-title">
-        Cluster Graph
+        Cluster Graph - <span class="badge badge-outline text-blue ml-2">{{cluster.label}}</span>
       </h2>
     </div>
     <div class="col-auto ms-auto">
@@ -57,8 +63,7 @@
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
               </div>
               <div class="offcanvas-body">
-                <div>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda ea est, eum exercitationem fugiat illum itaque laboriosam magni necessitatibus, nemo nisi numquam quae reiciendis repellat sit soluta unde. Aut!
+                <div id="end-body">
                 </div>
                 <div class="mt-3">
                   <button class="btn" type="button" data-bs-dismiss="offcanvas">
@@ -70,12 +75,12 @@
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasStart" aria-labelledby="offcanvasStartLabel" style="visibility: visible;" aria-modal="true" role="dialog">
               <div class="offcanvas-header">
-                <h2 class="offcanvas-title" id="offcanvasStartLabel">Start offcanvas</h2>
+                <h2 class="offcanvas-title" id="offcanvasStartLabel">TBD</h2>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
               </div>
               <div class="offcanvas-body">
                 <div>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab assumenda ea est, eum exercitationem fugiat illum itaque laboriosam magni necessitatibus, nemo nisi numquam quae reiciendis repellat sit soluta unde. Aut!
+                 TBD
                 </div>
                 <div class="mt-3">
                   <button class="btn" type="button" data-bs-dismiss="offcanvas">
@@ -91,9 +96,54 @@
     $(document).ready(function() {
       function loadGraph() {
         $.ajax({
-          url: "/api/v1/map",
+          url: "/api/v1/clusters/{{cluster.id}}/graph",
           type: "GET",
           success: function (data) {
+
+G6.registerEdge(
+  'circle-running',
+  {
+    afterDraw(cfg, group) {
+      // get the first shape in the group, it is the edge's path here=
+      const shape = group.get('children')[0];
+      // the start position of the edge's path
+      const startPoint = shape.getPoint(0);
+
+      // add red circle shape
+      const circle = group.addShape('circle', {
+        attrs: {
+          x: startPoint.x,
+          y: startPoint.y,
+          fill: '#1890ff',
+          r: 3,
+        },
+        name: 'circle-shape',
+      });
+
+      // animation for the red circle
+      circle.animate(
+        (ratio) => {
+          // the operations in each frame. Ratio ranges from 0 to 1 indicating the prograss of the animation. Returns the modified configurations
+          // get the position on the edge according to the ratio
+          const tmpPoint = shape.getPoint(ratio);
+          // returns the modified configurations here, x and y here
+          return {
+            x: tmpPoint.x,
+            y: tmpPoint.y,
+          };
+        },
+        {
+          repeat: true, // Whether executes the animation repeatly
+          duration: 3000, // the duration for executing once
+        },
+      );
+    },
+  },
+  'cubic', // extend the built-in edge 'cubic'
+);
+
+
+
             const tooltip = new G6.Tooltip({
                 offsetX: -100,
                 offsetY: 50,
@@ -209,23 +259,54 @@
                     }
                     // ... Other global configurations for combos
                 },
+                defaultEdge: {
+                  type: 'circle-running',
+                  style: {
+                    endArrow: true,
+                    lineWidth: 5,
+                    stroke: '#bae7ff',
+                  },
+                  labelCfg: {
+                    autoRotate: true,
+                    style: {
+                      stroke: "#fff",
+                      lineWidth: 5
+                    }
+                  }
+                },
+
                 /*
                 layout: {
                   type: "comboForce",
+                  preventComboOverlap:true,
                   comboSpacing: (d) => {
                     if (d.kind === "namespace") {
                       return 100
                     }
                   }
                 },
+
+  layout: {
+    type: 'grid',
+    begin: [20, 20],
+    width: width - 20,
+    height: height - 20,
+  },
                 */
+
                 modes: {
                     default: [{type: 'zoom-canvas',enableOptimize: true,optimizeZoom: 0.01},'drag-combo', 'drag-canvas'],
                 },
             });
             graph.data(data);
             graph.render();
-            graph.zoomTo("0.7")
+            graph.zoomTo("0.8")
+
+            // update edges
+            graph.on('combo:dragend', (evt) => {
+                graph.refreshPositions()
+
+            });
 
             graph.on('node:mouseenter', (evt) => {
                 const {
@@ -243,15 +324,36 @@
 
             graph.on('combo:click', (evt) => {
                 console.log(evt.item.getModel().id)
-            })
-
-            graph.on('node:click', (evt) => {
-                console.log(evt.item.getModel().id)
-                console.log(evt.item.getModel().kind)
                 var myOffcanvas = document.getElementById("offcanvasEnd")
                 var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
                 bsOffcanvas.toggle()
                 $("#offcanvasEndLabel").html(evt.item.getModel().id)
+                $("#end-body").html(evt.item.getModel().panel_html)
+            })
+
+            graph.on('node:click', (evt) => {
+                //console.log(evt.item.getModel().id)
+                //console.log(evt.item.getModel().kind)
+                var myOffcanvas = document.getElementById("offcanvasEnd")
+                var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
+                bsOffcanvas.toggle()
+//haaaaaaaa
+                $("#offcanvasEndLabel").html(evt.item.getModel().id)
+                $("#end-body").html(evt.item.getModel().panel_html)
+
+                /*
+                $.ajax({
+                  url: "/api/v1/containers/"+evt.item.getModel().db_id,
+                  type: "GET",
+                  success: function (data) {
+                  },
+                  error: function (request, status, error) {
+                    notify_js("Hmm. Something went wrong.", type="danger",time=1000)
+                    return false;
+                  }
+                });
+                */
+
                 const {
                     item
                 } = evt;

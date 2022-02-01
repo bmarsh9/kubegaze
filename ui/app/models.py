@@ -164,6 +164,66 @@ class Object(LogMixin,db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    def summary_html(self,container_name=None):
+#haaaaaaaaa
+        template = """
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">{}<span class="badge badge-sm badge-outline text-cyan ml-2">{}</span></h3>
+            </div>
+            <div class="card-body">
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="card bg-light">
+                      <div class="card-header">
+                        <h4 class="card-title text-dark">Details</h4>
+                        <div class="card-actions"><a href="#" class="btn text-white"><i class="ti ti-external-link"></i></a></div>
+                      </div>
+                      <div class="card-body scroll">
+                        <div class="table-responsive rounded-2">
+                          <table class="table table-vcenter">
+                            <thead class="bg-secondary">
+                              <tr>
+                                <th class="w-1 text-white">Key</th>
+                                <th class="text-white">Value</th>
+                                <th class="w-1"><i class="ti ti-external-link text-white"></i></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        """
+        rows = ""
+        row_template = """
+          <tr>
+            <td class="bg-secondary text-white subheader">{}</td>
+            <td class="text-secondary subheader">{}</td>
+            <td>{}</td>
+          </tr>"""
+
+        body = ""
+        name = self.name
+        kind = self.kind
+        if container_name:
+            name = container_name
+            kind = "container"
+            for container in self._spec["containers"]:
+                if container["name"] == container_name:
+                    for key,value in container.items():
+                        rows+=row_template.format(key,value,"")
+        template = template.format(name,kind,rows)
+        return template
+
 class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
@@ -296,8 +356,8 @@ class Event(LogMixin,db.Model, UserMixin):
                         <div class="col-6">
                           <div class="card bg-light">
                               <div class="card-header">
-                                <h3 class="card-title">Event Spec</h3>
-                                <div class="card-actions"><a href="/events/{}" class="btn text-dark"><i class="ti ti-external-link"></i></a></div>
+                                <h3 class="card-title text-dark">Event Spec</h3>
+                                <div class="card-actions"><a href="/events/{}" class="btn text-white"><i class="ti ti-external-link"></i></a></div>
                               </div>
                               <div class="card-body scroll">
                                 <pre>{}</pre>
@@ -472,52 +532,43 @@ class Cluster(LogMixin,db.Model, UserMixin):
         }
         node_style = {
             "cursor": 'pointer',
-            #"fill": "#F64E60",
             "fill": "#F3F6F9",
             "stroke": "#1b2434"
         }
-        donut_prop = {
-            "high": 5,
-            "moderate": 7,
-            "low": 9
+        combo_label = {"style":
+            {"fill":"#fff","fontSize":12}
         }
-        donut_color = {
-            "high": '#d63939',
-            "moderate": '#f76707',
-            "low": '#2fb344'
-        }
-        icon = {
-            "show": True,
-            "img": "/static/img/urgent.png",
-        }
-        combo_label = {"style":{"fill":"#fff","fontSize":12}}
         data = {
             "nodes":[],
             "combos":[],
-#            "edges": [{
-#                "source": 'combo1',
-#                "target": 'combo3',
-#            },]
+            "edges": [
+              {
+                "source": '5f0e2cff-4f50-497e-a3cb-01becd9a02d9',
+                "target": 'c28b4a09-c391-4605-90ad-b7831ee7af19',
+                "label":"80,443",
+                "size":10
+              },
+            ]
         }
 #haaaaaaa
+        #cluster
         data["combos"].append({"id":self.uuid,"label":self.label,"kind":"cluster","labelCfg":combo_label})
-
         #namespace
         for namespace in self.objects.filter(Object.kind == "namespace").all():
             data["combos"].append({"id":namespace.uid,
                 "label":namespace.name,"kind":"namespace",
-                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid})
+                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid,"panel_html":namespace.summary_html()})
             #pod
             for pod in self.objects.filter(Object.namespace == namespace.name).filter(Object.kind == "pod").all():
                 data["combos"].append({"id":pod.uid,
                     "label":"{}...".format(pod.name[:8]),"kind":"pod","parentId":namespace.uid,
-                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle"})
+                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle","panel_html":pod.summary_html()})
                 icon_url = "/static/img/flag-2.svg"
                 #container
                 for container in pod._spec["containers"]:
                     data["nodes"].append({"id":"{}-{}".format(pod.uid,container["name"]),"type":"donut",
-                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,
-                        "draggable":False,"html":"<h4>{}</h4>".format(container["name"]),"icon":icon,"donutAttrs": donut_prop,"donutColorMap": donut_color})
+                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,"panel_html":pod.summary_html(container_name=container["name"]),
+                        "draggable":False,"html":"<h4>{}</h4>".format(container["name"]),"label":50})
         return data
 
 class User(LogMixin,db.Model, UserMixin):

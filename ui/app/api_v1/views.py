@@ -168,8 +168,8 @@ def post_hits():
     db.session.commit()
     return jsonify({"message":"ok"})
 
-@api.route('/map', methods=['GET'])
+@api.route('/clusters/<int:id>/graph', methods=['GET'])
 @login_required
-def get_map():
-    cluster = Cluster.query.first()
+def get_graph(id):
+    cluster = Cluster.query.get(id)
     return jsonify(cluster.to_graph_format())
