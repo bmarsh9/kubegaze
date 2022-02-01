@@ -38,26 +38,22 @@ def get_token_for_cluster(id):
     return jsonify({"token":cluster.generate_auth_token()})
 
 @api.route('/cluster/objects', methods=['POST'])
-#@cluster_auth
+@cluster_auth
 def post_objects_from_cluster(cluster=None):
-    '''
     if current_app.config["DISABLE_CLUSTER_AUTH"] == "yes":
         cluster = Cluster.query.get(request.args.get("cluster_id",0))
         if not cluster:
             return jsonify({"message":"cluster not found. cluster authentication is disabled"}),404
-    '''
-
     cluster = Cluster.query.get(1)
     data = json.loads(request.get_json())
     for result in data:
         exists = Object.query.filter(Object.uid == result["uid"]).first()
         if not exists:
             object = Object(uid=result["uid"],kind=result["kind"],name=result["name"],
-                namespace=result["namespace"],_metadata=result["metadata"],_spec=result["spec"])
+                namespace=result["namespace"],data=result["data"])
             cluster.objects.append(object)
         else:
-            exists._metadata = result["metadata"]
-            exists._spec = result["spec"]
+            exists.data = result["data"]
     db.session.commit()
     return jsonify({"message":"ok"})
 
@@ -177,7 +173,6 @@ def get_graph(id):
 @api.route("/objects", methods=["GET"])
 @login_required
 def get_objects():
-#haaaaaa
     objects = Object.get_objects_from_api_query(
         clusters=request.args.getlist('clusters'),
         kinds=request.args.getlist('kinds'),

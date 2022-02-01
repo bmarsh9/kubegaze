@@ -33,7 +33,7 @@ input[type=number] {
   <div class="row row-cards col">
     <div class="col-12">
       <div class="alert alert-warning text-white bg-transparent" role="alert">
-        <small>Search and filter for objects that were discovered in your clusters</small>
+        <small>Install an indexer within your cluster to collect objects. Search and filter for objects that were discovered in your clusters</small>
       </div>
     </div>
     <div class="col-3">
@@ -87,7 +87,7 @@ input[type=number] {
                     <th class="text-white">Namespace</th>
                     <th class="text-white">Cluster</th>
                     <th class="text-white">Date Added</th>
-                    <th class="text-white">Spec</th>
+                    <th class="text-white">Data</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -99,7 +99,7 @@ input[type=number] {
   </div>
 
 <div class="modal modal-blur fade" id="specModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Object</h5>
@@ -145,7 +145,6 @@ input[type=number] {
       });
       $(document).on("click",".spawnModal",function() {
         var value = $(this).attr('data-attribute');
-//haaaaaaa
         $('#specModal').modal('show');
         $('#modalBody').html(value)
       });

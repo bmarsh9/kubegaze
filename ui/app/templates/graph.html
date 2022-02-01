@@ -13,7 +13,7 @@
   background-size: 30px 30px;
 }
 .offcanvas-end {
-  width: 50%
+  width: 75%
 }
 .offcanvas-start {
   width: 50%
@@ -146,7 +146,7 @@ G6.registerEdge(
 
             const tooltip = new G6.Tooltip({
                 offsetX: -100,
-                offsetY: 50,
+                offsetY: 100,
                 getContent(e) {
                     const outDiv = document.createElement('div');
                     outDiv.style.width = '180px';
@@ -275,32 +275,13 @@ G6.registerEdge(
                   }
                 },
 
-                /*
-                layout: {
-                  type: "comboForce",
-                  preventComboOverlap:true,
-                  comboSpacing: (d) => {
-                    if (d.kind === "namespace") {
-                      return 100
-                    }
-                  }
-                },
-
-  layout: {
-    type: 'grid',
-    begin: [20, 20],
-    width: width - 20,
-    height: height - 20,
-  },
-                */
-
                 modes: {
                     default: [{type: 'zoom-canvas',enableOptimize: true,optimizeZoom: 0.01},'drag-combo', 'drag-canvas'],
                 },
             });
             graph.data(data);
             graph.render();
-            graph.zoomTo("0.8")
+            //graph.zoomTo("1.0")
 
             // update edges
             graph.on('combo:dragend', (evt) => {

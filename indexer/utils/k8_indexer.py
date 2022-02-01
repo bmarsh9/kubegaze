@@ -23,9 +23,9 @@ class K8Indexer():
             results = getattr(self,method)()
             if results:
                 if dump:
-                    data.append(json.dumps({"operation":method,"data":results},default=str))
+                    data.append(json.dumps({"operation":method,"results":results},default=str))
                 else:
-                    data.append({"operation":method,"data":results})
+                    data.append({"operation":method,"results":results})
         return data
 
     # Core
@@ -35,7 +35,7 @@ class K8Indexer():
         results = v1.list_node()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"node","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"node","data":record})
         return data
 
     def get_namespaces(self):
@@ -44,7 +44,7 @@ class K8Indexer():
         results = v1.list_namespace()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["name"],"kind":"namespace","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["name"],"kind":"namespace","data":record})
         return data
 
     def get_pods(self):
@@ -53,7 +53,7 @@ class K8Indexer():
         results = v1.list_pod_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"pod","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"pod","data":record})
         return data
 
     def get_containers(self):
@@ -66,7 +66,7 @@ class K8Indexer():
         results = v1.list_daemon_set_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"daemon_set","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"daemon_set","data":record})
         return data
 
     def get_deployments(self):
@@ -75,7 +75,7 @@ class K8Indexer():
         results = v1.list_deployment_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"deployment","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"deployment","data":record})
         return data
 
     def get_replica_sets(self):
@@ -84,7 +84,7 @@ class K8Indexer():
         results = v1.list_replica_set_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"replica_set","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"replica_set","data":record})
         return data
 
     def get_stateful_sets(self):
@@ -93,7 +93,7 @@ class K8Indexer():
         results = v1.list_stateful_set_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"stateful_set","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"stateful_set","data":record})
         return data
 
     def get_cron_jobs(self):
@@ -102,7 +102,7 @@ class K8Indexer():
         results = v1.list_cron_job_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"cron_job","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"cron_job","data":record})
         return data
 
     def get_jobs(self):
@@ -111,7 +111,7 @@ class K8Indexer():
         results = v1.list_job_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"job","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"job","data":record})
         return data
 
     def get_config_maps(self):
@@ -120,7 +120,7 @@ class K8Indexer():
         results = v1.list_config_map_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"config_map","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"config_map","data":record})
         return data
 
     def get_endpoints(self):
@@ -129,7 +129,7 @@ class K8Indexer():
         results = v1.list_endpoints_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"endpoint","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"endpoint","data":record})
         return data
 
     def get_events(self):
@@ -138,7 +138,7 @@ class K8Indexer():
         results = v1.list_event_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"event","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"event","data":record})
         return data
 
     # Rbac
@@ -148,7 +148,7 @@ class K8Indexer():
         results = v1.list_secret_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"secret","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"secret","data":record})
         return data
 
     def get_svc_accounts(self):
@@ -157,7 +157,7 @@ class K8Indexer():
         results = v1.list_service_account_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"service_account","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"service_account","data":record})
         return data
 
     def get_role_bindings(self):
@@ -166,7 +166,7 @@ class K8Indexer():
         results = v1.list_role_binding_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"role_binding","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"role_binding","data":record})
         return data
 
     def get_roles(self):
@@ -175,7 +175,7 @@ class K8Indexer():
         results = v1.list_role_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"role","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"role","data":record})
         return data
 
     # Networking
@@ -185,7 +185,7 @@ class K8Indexer():
         results = v1.list_service_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"service","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"service","data":record})
         return data
 
     def get_ingress(self):
@@ -194,7 +194,7 @@ class K8Indexer():
         results = v1.list_ingress_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"ingress","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"ingress","data":record})
         return data
 
     def get_network_policies(self):
@@ -203,5 +203,5 @@ class K8Indexer():
         results = v1.list_network_policy_for_all_namespaces()
         for record in results.to_dict()["items"]:
             data.append({"name":record["metadata"]["name"],"uid":record["metadata"]["uid"],
-                "namespace":record["metadata"]["namespace"],"kind":"network_policy","metadata":record["metadata"],"spec":record.get("spec")})
+                "namespace":record["metadata"]["namespace"],"kind":"network_policy","data":record})
         return data

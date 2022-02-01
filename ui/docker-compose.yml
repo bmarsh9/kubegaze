@@ -9,7 +9,7 @@ services:
 
   kubegaze_ui:
     container_name: kubegaze-ui
-    image: bmarsh13/kubegaze-ui:1.0.0
+    image: bmarsh13/kubegaze-ui:2.0.0
     depends_on:
       - postgres_db
     networks:

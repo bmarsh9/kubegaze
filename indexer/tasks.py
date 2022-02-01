@@ -27,10 +27,10 @@ def get_collection(app, logging):
 
     collections = K8Indexer(in_cluster=in_cluster).get_all(dump=False)
     for collection in collections:
-        num_of_records = len(collection["data"])
+        num_of_records = len(collection["results"])
         logging.debug("Collected {} results for {}".format(num_of_records,collection["operation"]))
         # send data to UI server
-        request = requests.post(url=objects_url,json=json.dumps(collection["data"],default=str),verify=verify,headers={"token":app.TOKEN})
+        request = requests.post(url=objects_url,json=json.dumps(collection["results"],default=str),verify=verify,headers={"token":app.TOKEN})
         if not request.ok:
             logging.warning("Unable to send collection results to {}. Status code: {}. Warning:{}".format(objects_url,
                 request.status_code,request.text))

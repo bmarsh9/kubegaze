@@ -51,6 +51,9 @@ def add_cluster():
 @login_required
 def graph(id):
     cluster = Cluster.query.get(id)
+    if not cluster.objects.first():
+        flash("Install the indexer in your cluster to gather graph details")
+        return redirect(url_for("main.clusters"))
     return render_template("graph.html",cluster=cluster)
 
 @main.route('/site', methods=['GET'])
