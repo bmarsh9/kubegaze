@@ -149,6 +149,148 @@ class Rule(LogMixin,db.Model, UserMixin):
         template+=row_template.format("remediation",self.remediation)
         return shell_template.format(template)
 
+class Object(LogMixin,db.Model):
+    __tablename__ = 'objects'
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String(),unique=True)
+    kind = db.Column(db.String(),default="unknown")
+    name = db.Column(db.String(),default="unknown")
+    namespace = db.Column(db.String(),default="unknown")
+    data = db.Column(db.JSON(),default={})
+    events = db.relationship('Event', backref='object', lazy='dynamic')
+    cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_kinds():
+        objects = Object.query.with_entities(Object.kind).distinct().all()
+        return [x[0] for x in objects]
+
+    @staticmethod
+    def get_objects_from_api_query(kinds=[],clusters=[]):
+        data = []
+        _query = Object.query
+        if clusters:
+            _query = _query.filter(Object.cluster_id.in_(clusters))
+        if kinds:
+            _query = _query.filter(func.lower(Object.kind).in_(kinds))
+        for record in _query.all():
+            spec_link = ""
+            if record.data:
+                spec_link = "<a href='#' data-attribute='{}' class='spawnModal btn btn-dark'>Spec</a>".format(json.dumps(record.data))
+            data.append([record.name,record.kind,record.namespace,
+                record.cluster.label,record.date_added,
+                spec_link])
+        return data
+
+    #----------------------------------- Helper Functions
+    def pod_has_label(self,key,value):
+        if self.kind != "pod":
+            return False
+        label = self.data["metadata"]["labels"]
+        if not label:
+            return False
+        if label.get(key) == value:
+            return True
+        return False
+
+    def get_pod_info(self):
+        if self.kind != "pod":
+            return None
+        labels = self.data["metadata"]["labels"]
+        # get services
+        services = []
+        if labels:
+            for service in Object.query.filter(Object.kind == "service").all():
+                if service.data["spec"]["selector"]:
+                    for key,value in service.data["spec"]["selector"].items():
+                        if self.pod_has_label(key,value):
+                            services.append(service.data["spec"])
+                            break
+        return {
+            "uid":self.uid,
+            "name":self.name,
+            "namespace":self.namespace,
+            "node_name":self.data["spec"]["node_name"],
+            "pod_ip":self.data["status"]["pod_ip"],
+            "phase":self.data["status"]["phase"],
+            "start_time":self.data["status"]["start_time"],
+            "host_ip":self.data["status"]["host_ip"],
+            "service_account":self.data["spec"]["service_account_name"],
+            "services":services,
+            "labels":labels
+        }
+
+    @staticmethod
+    def find_container(pod_uid,container_name,to_html=False):
+        data = {}
+        pod = Object.query.filter(Object.kind == "pod").filter(Object.uid == pod_uid).first()
+        if pod:
+            if pod.data:
+                # find container
+                for container in pod.data["spec"]["containers"]:
+                    if container["name"] == container_name:
+                        # get status
+                        for status in pod.data["status"]["container_statuses"]:
+                            if status["name"] == container_name:
+                                container["status"] = status
+                        container["pod"] = pod.get_pod_info()
+                        data = container
+        if to_html:
+            return Object.get_container_html(data)
+        return data
+
+    @staticmethod
+    def get_container_html(data):
+        template = """
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">{}<span class="badge badge-sm badge-outline text-cyan ml-2">{}</span></h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12">
+                  <div class="card bg-light">
+                      <div class="card-header">
+                        <h4 class="card-title text-dark">Spec</h4>
+                      </div>
+                      <div class="card-body scroll">
+                        <div class="table-responsive rounded-2">
+                          <table class="table table-vcenter">
+                            <thead class="bg-secondary">
+                              <tr>
+                                <th class="w-1 text-white">Key</th>
+                                <th class="text-white">Value</th>
+                                <th class="w-1"><i class="ti ti-external-link text-white"></i></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        """
+        rows = ""
+        row_template = """
+          <tr>
+            <td class="bg-secondary text-white subheader">{}</td>
+            <td class="text-secondary subheader">{}</td>
+            <td>{}</td>
+          </tr>"""
+        if not data:
+            return data
+        for key,value in data.items():
+            rows+=row_template.format(key,value,"")
+        template = template.format(data["name"],"container",rows)
+        return template
+
 class Event(LogMixin,db.Model, UserMixin):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
@@ -161,6 +303,7 @@ class Event(LogMixin,db.Model, UserMixin):
     data = db.Column(db.JSON(),default={})
     tags = db.relationship('Tag', secondary='assoc_tags', lazy='dynamic')
     seen = db.Column(db.Boolean, default=False) # ran against rules
+    object_id = db.Column(db.Integer, db.ForeignKey('objects.id'))
     cluster_id = db.Column(db.Integer, db.ForeignKey('clusters.id'), nullable=False)
     alerts = db.relationship('Alert', backref='event', lazy='dynamic')
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
@@ -280,8 +423,8 @@ class Event(LogMixin,db.Model, UserMixin):
                         <div class="col-6">
                           <div class="card bg-light">
                               <div class="card-header">
-                                <h3 class="card-title">Event Spec</h3>
-                                <div class="card-actions"><a href="/events/{}" class="btn text-dark"><i class="ti ti-external-link"></i></a></div>
+                                <h3 class="card-title text-dark">Event Spec</h3>
+                                <div class="card-actions"><a href="/events/{}" class="btn text-white"><i class="ti ti-external-link"></i></a></div>
                               </div>
                               <div class="card-body scroll">
                                 <pre>{}</pre>
@@ -378,9 +521,19 @@ class Cluster(LogMixin,db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(),nullable=False)
     label = db.Column(db.String(),nullable=False)
+    objects = db.relationship('Object', backref='cluster', lazy='dynamic')
     events = db.relationship('Event', backref='cluster', lazy='dynamic')
+    last_indexed = db.Column(db.DateTime)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    def has_recent_stream(self):
+        now = arrow.utcnow()
+        return Event.query.filter(Event.cluster_id == self.id).filter(or_(Event.date_added > now.shift(hours=-1).datetime,Event.date_updated > now.shift(hours=-1).datetime)).first()
+
+    def has_recent_index(self):
+        now = arrow.utcnow()
+        return Object.query.filter(Object.cluster_id == self.id).filter(or_(Object.date_added > now.shift(hours=-1).datetime,Object.date_updated > now.shift(hours=-1).datetime)).first()
 
     def get_rules(self):
         rules = []
@@ -443,6 +596,51 @@ class Cluster(LogMixin,db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'],expires_in=31536000)
         token = s.dumps({"type":"poller"})
         return token.decode("utf-8")
+
+    def to_graph_format(self):
+        label = {
+            "positions": 'center',
+            "style": {
+                "fontSize": 12,
+                "fill": "#F3F6F9",
+            },
+        }
+        node_style = {
+            "cursor": 'pointer',
+            "stroke": "#1b2434"
+        }
+        combo_label = {"style":
+            {"fill":"#fff","fontSize":12}
+        }
+        data = {
+            "nodes":[],
+            "combos":[],
+            "edges": [
+            ]
+        }
+        #cluster
+        data["combos"].append({"id":self.uuid,"label":self.label,"kind":"cluster","labelCfg":combo_label})
+        #namespace
+        for namespace in self.objects.filter(Object.kind == "namespace").all():
+            data["combos"].append({"id":namespace.uid,
+                "label":namespace.name,"kind":"namespace",
+                "draggable":False,"collapsed": True,"labelCfg":combo_label,"parentId":self.uuid})
+            #pod
+            for pod in self.objects.filter(Object.namespace == namespace.name).filter(Object.kind == "pod").all():
+                data["combos"].append({"id":pod.uid,
+                    "label":"{}...".format(pod.name[:8]),"kind":"pod","parentId":namespace.uid,
+                    "draggable":False,"collapsed": False,"labelCfg":combo_label,"type":"circle"})
+                #container
+                for container in pod.data["spec"]["containers"]:
+                    info = Object.find_container(pod.uid,container["name"])
+                    panel_html = Object.get_container_html(info)
+                    html = "<h4>Name: {}</h4><br><p>Namespace: {}</p><p>Image: {}</p><p>Status: {}</p>".format(container["name"],
+                        pod.namespace,container["image"],info["status"]["state"])
+                    data["nodes"].append({"id":"{}-{}".format(pod.uid,container["name"]),
+                        "size":30,"kind":"container","comboId":pod.uid,"style":node_style,
+                        "panel_html":panel_html,"draggable":False,
+                        "html":html})
+        return data
 
 class User(LogMixin,db.Model, UserMixin):
     __tablename__ = 'users'

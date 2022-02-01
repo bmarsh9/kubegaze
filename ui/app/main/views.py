@@ -12,6 +12,22 @@ from datetime import datetime, timedelta
 def home():
     return render_template("dashboard.html")
 
+@main.route('/objects', methods=['GET'])
+@login_required
+def objects():
+    kinds = request.args.getlist('kinds')
+    clusters = request.args.getlist('clusters')
+    filters = {
+        "clusters":clusters,
+        "kinds":kinds,
+    }
+    cluster_list = Cluster.query.all()
+    kind_list = Object.get_kinds()
+    query_string = request.query_string.decode("utf-8")
+    return render_template("objects.html",filters=filters,
+        kind_list=kind_list,query_string=query_string,
+        cluster_list=cluster_list)
+
 @main.route('/clusters', methods=['GET'])
 @login_required
 def clusters():
@@ -31,10 +47,14 @@ def add_cluster():
     flash("Added Cluster")
     return redirect(url_for("main.view_cluster",id=new_cluster.id))
 
-@main.route('/graph', methods=['GET'])
+@main.route('/clusters/<int:id>/graph', methods=['GET'])
 @login_required
-def graph():
-    return render_template("graph.html")
+def graph(id):
+    cluster = Cluster.query.get(id)
+    if not cluster.objects.first():
+        flash("Install the indexer in your cluster to gather graph details")
+        return redirect(url_for("main.clusters"))
+    return render_template("graph.html",cluster=cluster)
 
 @main.route('/site', methods=['GET'])
 @login_required

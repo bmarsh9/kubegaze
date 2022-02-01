@@ -21,7 +21,7 @@
             <div class="card-actions"><span class="badge bg-yellow-lt ml-2">{{event.alerts.count()}} alerts</span></div>
           </div>
           <div class="card-body">
-          <pre>
+          <pre class="text-light">
           {{json_data}}
           </pre>
           </div>
@@ -44,7 +44,7 @@
             {{alert.rule.get_table_for_rule_details()|safe}}
             <div class="mt-2">
             <h4>Evidence</h4>
-            <pre style="white-space:normal">
+            <pre style="white-space:normal" class="text-light">
             {{alert.evidence}}
             </pre>
             </div>

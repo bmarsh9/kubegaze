@@ -46,9 +46,12 @@
                 <thead class="bg-white-lt">
                   <tr>
                     <th class="text-white">Label</th>
+                    <th class="w-1 text-white">Stream</th>
+                    <th class="w-1 text-white">Objects</th>
                     <th class="text-white">Rules</th>
                     <th class="text-white">Events</th>
                     <th class="text-white">Alerts</th>
+                    <th class="w-1 text-white">Graph</th>
                     <th class="w-1 text-white">Edit</th>
                   </tr>
                 </thead>
@@ -56,9 +59,20 @@
                   {% for cluster in clusters %}
                   <tr>
                     <td class="subheader text-white">{{cluster.label}}</td>
+                    {%if cluster.has_recent_stream()%}
+                    <td class="subheader text-white"><span class="status-indicator status-green status-indicator-animated"><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span></span></td>
+                    {%else%}
+                    <td class="subheader text-white"><span class="status-indicator status-red status-indicator-animated"><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span></span></td>
+                    {%endif%}
+                    {%if cluster.has_recent_index()%}
+                    <td class="subheader text-white"><span class="status-indicator status-green status-indicator-animated"><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span></span></td>
+                    {%else%}
+                    <td class="subheader text-white"><span class="status-indicator status-red status-indicator-animated"><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span><span class="status-indicator-circle"></span></span></td>
+                    {%endif%}
                     <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.get_rules()|length}}</span></td>
                     <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.events.count()}}</span></td>
                     <td class="subheader"><span class="badge bg-white text-dark badge-sm">{{cluster.get_alerts()|length}}</span></td>
+                    <td class="text-center"><a href="{{url_for("main.graph",id=cluster.id)}}"><i class="ti ti-chart-circles text-yellow"></i></a></td>
                     <td class="text-center"><a href="{{url_for("main.view_cluster",id=cluster.id)}}"><i class="ti ti-edit text-yellow"></i></a></td>
                   </tr>
                   {%endfor%}

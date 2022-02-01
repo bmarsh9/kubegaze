@@ -5,6 +5,7 @@ from flask_login import login_required
 from app.utils.decorators import roles_required,cluster_auth,poller_auth
 from app.utils.misc import generate_uuid
 from datetime import datetime, timedelta
+import json
 
 @api.route('/health', methods=['GET'])
 def get_health():
@@ -35,6 +36,26 @@ def check_token_for_poller():
 def get_token_for_cluster(id):
     cluster = Cluster.query.get(id)
     return jsonify({"token":cluster.generate_auth_token()})
+
+@api.route('/cluster/objects', methods=['POST'])
+@cluster_auth
+def post_objects_from_cluster(cluster=None):
+    if current_app.config["DISABLE_CLUSTER_AUTH"] == "yes":
+        cluster = Cluster.query.get(request.args.get("cluster_id",0))
+        if not cluster:
+            return jsonify({"message":"cluster not found. cluster authentication is disabled"}),404
+    cluster = Cluster.query.get(1)
+    data = json.loads(request.get_json())
+    for result in data:
+        exists = Object.query.filter(Object.uid == result["uid"]).first()
+        if not exists:
+            object = Object(uid=result["uid"],kind=result["kind"],name=result["name"],
+                namespace=result["namespace"],data=result["data"])
+            cluster.objects.append(object)
+        else:
+            exists.data = result["data"]
+    db.session.commit()
+    return jsonify({"message":"ok"})
 
 @api.route('/cluster/events', methods=['POST'])
 @cluster_auth
@@ -143,51 +164,17 @@ def post_hits():
     db.session.commit()
     return jsonify({"message":"ok"})
 
-@api.route('/map', methods=['GET'])
+@api.route('/clusters/<int:id>/graph', methods=['GET'])
 @login_required
-def get_map():
-    label = {
-        "positions": 'center',
-        "style": {
-            "fontSize": 12,
-            "fill": "#F3F6F9",
-        },
-    }
-    node_style = {
-        "cursor": 'pointer',
-        #"fill": "#F64E60",
-        "fill": "#F3F6F9",
-        "stroke": "#1b2434"
-    }
-    donut_prop = {
-        "high": 5,
-        "moderate": 7,
-        "low": 9
-    }
-    donut_color = {
-        "high": '#d63939',
-        "moderate": '#f76707',
-        "low": '#2fb344'
-    }
-    icon = {
-        "show": True,
-        "img": "/static/img/urgent.png",
-    }
+def get_graph(id):
+    cluster = Cluster.query.get(id)
+    return jsonify(cluster.to_graph_format())
 
-    data = {
-        "nodes":[],
-        "combos":[],
-        "edges": [{
-            "source": 'combo1',
-            "target": 'combo3',
-        },]
-    }
-    combo_label = {"style":{"fill":"#fff","fontSize":12}}
-
-    for enum,node in enumerate(range(0,3)):
-        icon_url = "/static/img/flag-2.svg"
-        data["nodes"].append({"id":"node{}".format(enum),"type":"donut","size":40,"kind":"container","x":250,"y":200,"comboId":"combo1","style":node_style,"draggable":False,"html":"<h4>hey</h4>","icon":icon,"donutAttrs": donut_prop,"donutColorMap": donut_color})
-    for enum,node in enumerate(range(0,3)):
-        data["combos"].append({"id":"combo{}".format(enum),"label":"combo{}".format(enum),"kind":"pod","comboId":"combo1","draggable":False,"collapsed": True,"labelCfg":combo_label})
-
-    return jsonify(data)
+@api.route("/objects", methods=["GET"])
+@login_required
+def get_objects():
+    objects = Object.get_objects_from_api_query(
+        clusters=request.args.getlist('clusters'),
+        kinds=request.args.getlist('kinds'),
+    )
+    return jsonify({"data":objects})
