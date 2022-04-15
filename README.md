@@ -89,17 +89,20 @@ sudo microk8s.kubectl get pods --all-namespaces
 - `microk8s.kubectl apply -f config/validate.yaml`
 
 #### Debug
-microk8s.kubectl get validatingwebhookconfigurations
-microk8s.kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io validating-webhook
-microk8s.kubectl delete secret webhook-certs -n webhook
-microk8s.kubectl delete deployments webhook -n webhoo
-microk8s.kubectl exec --stdin --tty webhook-8647f75dd6-gprxb -n webhook -- bash
-invoke generate_keys webhook webhook
-openssl x509 -text -noout -in keys/server.crt
-microk8s.kubectl delete pod nginx --grace-period=0 --force
-microk8s.kubectl logs webhook-7b49f7f5b-xkkgm -n webhook -f
+```
+microk8s.kubectl get validatingwebhookconfigurations  
+microk8s.kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io validating-webhook  
+microk8s.kubectl delete secret webhook-certs -n webhook  
+microk8s.kubectl delete deployments webhook -n webhook  
+microk8s.kubectl exec --stdin --tty webhook-8647f75dd6-gprxb -n webhook -- bash  
+invoke generate_keys webhook webhook  
+openssl x509 -text -noout -in keys/server.crt  
+microk8s.kubectl delete pod nginx --grace-period=0 --force  
+microk8s.kubectl logs webhook-7b49f7f5b-xkkgm -n webhook -f  
+```
 
 ##### Check admission compat
+```
 microk8s.kubectl api-versions | grep admissionregistration
-
+```
 
